@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:you/models/user_model.dart';
+import 'package:you/screens/add_edit_screen.dart';
 import 'package:you/services/login_service.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -25,6 +27,12 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Get.to(() => AddEditScreen(isAdding: true, userModel: userModel));
+        },
+        child: const Icon(Icons.add),
+      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -48,7 +56,9 @@ class _HomeScreenState extends State<HomeScreen> {
       shrinkWrap: true,
       itemBuilder: (context, index) {
         return GestureDetector(
-          onTap: () {},
+          onTap: () {
+            Get.to(() => AddEditScreen(userModel: userModel, isAdding: false, index: index));
+          },
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 24),
             child: Card(
@@ -60,8 +70,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   userModel!.habitDetails[index]['name'],
                   style: const TextStyle(fontSize: 20),
                 ),
-                trailing: Text(
-                    "${userModel!.habitRecords[index]['270722'] ?? "0"}/${userModel!.habitDetails[index]['goal']}"),
+                //trailing: Text(
+                // "${userModel!.habitRecords[index]['270722'] ?? "0"}/${userModel!.habitDetails[index]['goal']}"),
               ),
             ),
           ),
