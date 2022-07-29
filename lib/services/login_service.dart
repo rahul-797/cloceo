@@ -1,21 +1,21 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:you/models/user_model.dart';
 import 'package:you/screens/home_screen.dart';
 import 'package:you/screens/login_screen.dart';
 
 class LoginService {
   static final FirebaseAuth auth = FirebaseAuth.instance;
-  static late final User? user;
-  static late final GoogleSignIn googleSignIn;
+  static late User? user;
+  final GoogleSignIn googleSignIn = GoogleSignIn();
 
   LoginService._privateConstructor();
 
   static final LoginService instance = LoginService._privateConstructor();
 
   login() async {
-    googleSignIn = GoogleSignIn();
-
     final GoogleSignInAccount? googleSignInAccount = await googleSignIn.signIn();
 
     if (googleSignInAccount != null) {
@@ -28,13 +28,26 @@ class LoginService {
       try {
         final UserCredential userCredential = await auth.signInWithCredential(credential);
         user = userCredential.user;
-        Get.to(() => const HomeScreen());
-      } on FirebaseAuthException catch (e) {
-        if (e.code == 'account-exists-with-different-credential') {
-          print(e);
-        } else if (e.code == 'invalid-credential') {
+
+        // Create empty document with email ID
+        try {
+          FirebaseFirestore.instance
+              .collection('users')
+              .doc(FirebaseAuth.instance.currentUser!.email)
+              .get()
+              .then((docSnapshot) => {
+                    if (!docSnapshot.exists)
+                      {
+                        FirebaseFirestore.instance
+                            .collection('users')
+                            .doc(FirebaseAuth.instance.currentUser!.email)
+                            .set(UserModel(habitDetails: [], habitRecords: []).toJson())
+                      }
+                  });
+        } catch (e) {
           print(e);
         }
+        Get.to(() => const HomeScreen());
       } catch (e) {
         print(e);
       }
@@ -42,7 +55,6 @@ class LoginService {
   }
 
   logout() async {
-    final GoogleSignIn googleSignIn = GoogleSignIn();
     try {
       await googleSignIn.signOut();
       await auth.signOut();

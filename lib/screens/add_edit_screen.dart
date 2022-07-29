@@ -39,7 +39,7 @@ class _AddEditScreenState extends State<AddEditScreen> {
     if (widget.userModel != null) {
       userModel = widget.userModel!;
       index = widget.index ?? 0;
-      if (userModel.habitDetails.isNotEmpty) {
+      if (userModel.habitDetails.isNotEmpty && !widget.isAdding) {
         name = userModel.habitDetails[index]["name"];
         goal = userModel.habitDetails[index]["goal"];
         type = userModel.habitDetails[index]["type"];

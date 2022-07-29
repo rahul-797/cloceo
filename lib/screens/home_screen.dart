@@ -55,33 +55,35 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget showHabitTiles() {
-    return ListView.builder(
-      itemCount: userModel!.habitDetails.length,
-      shrinkWrap: true,
-      itemBuilder: (context, index) {
-        return GestureDetector(
-          onTap: () {
-            showBottomSheet(index);
-          },
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 24),
-            child: Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: ListTile(
-                title: Text(
-                  userModel!.habitDetails[index]['name'],
-                  style: const TextStyle(fontSize: 20),
+    return userModel != null && userModel!.habitDetails.isNotEmpty
+        ? ListView.builder(
+            itemCount: userModel!.habitDetails.length,
+            shrinkWrap: true,
+            itemBuilder: (context, index) {
+              return GestureDetector(
+                onTap: () {
+                  showBottomSheet(index);
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 24),
+                  child: Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: ListTile(
+                      title: Text(
+                        userModel!.habitDetails[index]['name'],
+                        style: const TextStyle(fontSize: 20),
+                      ),
+                      //trailing: Text(
+                      // "${userModel!.habitRecords[index]['270722'] ?? "0"}/${userModel!.habitDetails[index]['goal']}"),
+                    ),
+                  ),
                 ),
-                //trailing: Text(
-                // "${userModel!.habitRecords[index]['270722'] ?? "0"}/${userModel!.habitDetails[index]['goal']}"),
-              ),
-            ),
-          ),
-        );
-      },
-    );
+              );
+            },
+          )
+        : const Center(child: Text("Create first habit"));
   }
 
   showBottomSheet(int index) {
