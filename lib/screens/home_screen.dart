@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:sleek_circular_slider/sleek_circular_slider.dart';
 import 'package:you/models/user_model.dart';
 import 'package:you/screens/add_edit_screen.dart';
+import 'package:you/screens/calender_screen.dart';
 import 'package:you/services/login_service.dart';
 import 'package:you/utils/date_provider.dart';
 
@@ -122,11 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: IconButton(
                               onPressed: () {
                                 Navigator.pop(context);
-                                // Get.to(() => HabitRecordView(
-                                //       habitId: Fetch.listHabit.value![index][DbService.columnId],
-                                //       goalCount: int.parse(Fetch.listHabit.value![index][DbService.columnHabitGoalCount]),
-                                //       habitName: Fetch.listHabit.value![index][DbService.columnHabitName],
-                                //     ));
+                                Get.to(() => CalenderScreen(userModel: userModel!, index: index));
                               },
                               icon: const Icon(Icons.calendar_month_rounded)),
                         ),
