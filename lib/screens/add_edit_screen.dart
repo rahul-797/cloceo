@@ -39,10 +39,12 @@ class _AddEditScreenState extends State<AddEditScreen> {
     if (widget.userModel != null) {
       userModel = widget.userModel!;
       index = widget.index ?? 0;
-      name = userModel.habitDetails[index]["name"];
-      goal = userModel.habitDetails[index]["goal"];
-      type = userModel.habitDetails[index]["type"];
-      repetition = userModel.habitDetails[index]["repetition"];
+      if (userModel.habitDetails.isNotEmpty) {
+        name = userModel.habitDetails[index]["name"];
+        goal = userModel.habitDetails[index]["goal"];
+        type = userModel.habitDetails[index]["type"];
+        repetition = userModel.habitDetails[index]["repetition"];
+      }
     } else {
       userModel = UserModel(habitDetails: [], habitRecords: []);
     }
@@ -60,6 +62,7 @@ class _AddEditScreenState extends State<AddEditScreen> {
               ElevatedButton(
                 onPressed: () {
                   userModel.habitDetails.removeAt(index);
+                  userModel.habitRecords.removeAt(index);
                   update(userModel);
                   Get.offAll(() => const HomeScreen());
                 },
@@ -223,6 +226,7 @@ class _AddEditScreenState extends State<AddEditScreen> {
                     "type": type,
                     "repetition": repetition,
                   });
+                  userModel.habitRecords.add({});
                 } else {
                   userModel.habitDetails[index] = {
                     "name": name,
