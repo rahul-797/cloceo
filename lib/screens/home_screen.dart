@@ -32,34 +32,32 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text("Cloceo"),
+        actions: [
+          IconButton(
+              onPressed: () {
+                loginService.logout();
+              },
+              icon: const Icon(Icons.logout)),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Get.to(() => AddEditScreen(isAdding: true, userModel: userModel));
         },
         child: const Icon(Icons.add),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            isLoading ? const Center(child: CircularProgressIndicator()) : showHabitTiles(),
-            ElevatedButton(
-              onPressed: () {
-                loginService.logout();
-              },
-              child: const Text("Logout"),
-            ),
-          ],
-        ),
-      ),
+      body: isLoading ? const Center(child: CircularProgressIndicator()) : showHabitTiles(),
     );
   }
 
   Widget showHabitTiles() {
     return userModel != null && userModel!.habitDetails.isNotEmpty
         ? ListView.builder(
-            itemCount: userModel!.habitDetails.length,
+      itemCount: userModel!.habitDetails.length,
             shrinkWrap: true,
+            padding: const EdgeInsets.fromLTRB(0, 24, 0, 0),
             itemBuilder: (context, index) {
               return GestureDetector(
                 onTap: () {
@@ -76,8 +74,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         userModel!.habitDetails[index]['name'],
                         style: const TextStyle(fontSize: 20),
                       ),
-                      //trailing: Text(
-                      // "${userModel!.habitRecords[index]['270722'] ?? "0"}/${userModel!.habitDetails[index]['goal']}"),
+                      trailing: Text(
+                          "${userModel!.habitRecords[index][getDateId(dateTime)] ?? "0"}/${userModel!.habitDetails[index]["goal"]}"),
                     ),
                   ),
                 ),
@@ -92,7 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
       Wrap(
         children: [
           StatefulBuilder(
-            builder: (BuildContext context, StateSetter setState) {
+            builder: (BuildContext context, StateSetter setBottomState) {
               return Container(
                 decoration: const BoxDecoration(
                   color: Colors.white,
@@ -169,6 +167,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               }
                               update(userModel!);
                               setState(() {});
+                              setBottomState(() {});
                             },
                             icon: const Icon(Icons.remove),
                             iconSize: 36,
@@ -229,6 +228,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               }
                               update(userModel!);
                               setState(() {});
+                              setBottomState(() {});
                             },
                             icon: const Icon(Icons.add),
                             iconSize: 36,
