@@ -262,20 +262,45 @@ class _AddEditScreenState extends State<AddEditScreen> {
                   }
                 } else {
                   // update habit
-                  if (type == "make") {
-                    userModel.habitDetails[index] = {
-                      "name": name,
-                      "goal": goal,
-                      "type": type,
-                      "repetition": repetition,
-                    };
+                  String previousType = isHabitMake! ? "make" : "break";
+                  if (previousType == type) {
+                    if (type == "make") {
+                      userModel.habitDetails[index] = {
+                        "name": name,
+                        "goal": goal,
+                        "type": type,
+                        "repetition": repetition,
+                      };
+                    } else {
+                      userModel.habitBreakDetails[index] = {
+                        "name": name,
+                        "goal": goal,
+                        "type": type,
+                        "repetition": repetition,
+                      };
+                    }
                   } else {
-                    userModel.habitBreakDetails[index] = {
-                      "name": name,
-                      "goal": goal,
-                      "type": type,
-                      "repetition": repetition,
-                    };
+                    if (type == "make") {
+                      userModel.habitDetails.insert(0, {
+                        "name": name,
+                        "goal": goal,
+                        "type": type,
+                        "repetition": repetition,
+                      });
+                      userModel.habitBreakDetails.removeAt(index);
+                      userModel.habitRecords.insert(0, userModel.habitBreakRecords[index]);
+                      userModel.habitBreakRecords.removeAt(index);
+                    } else {
+                      userModel.habitBreakDetails.insert(0, {
+                        "name": name,
+                        "goal": goal,
+                        "type": type,
+                        "repetition": repetition,
+                      });
+                      userModel.habitDetails.removeAt(index);
+                      userModel.habitBreakRecords.insert(0, userModel.habitRecords[index]);
+                      userModel.habitRecords.removeAt(index);
+                    }
                   }
                 }
                 update(userModel);
