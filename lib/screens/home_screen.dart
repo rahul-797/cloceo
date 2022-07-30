@@ -51,9 +51,23 @@ class _HomeScreenState extends State<HomeScreen> {
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 16),
+                  child: Text(
+                    "Habits to make",
+                    style: TextStyle(fontSize: 18),
+                  ),
+                ),
                 showMakeHabitTiles(),
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 16),
+                  child: Text(
+                    "Habits to break",
+                    style: TextStyle(fontSize: 18),
+                  ),
+                ),
                 showBreakHabitTiles(),
               ],
             ),
@@ -63,10 +77,11 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget showMakeHabitTiles() {
     return userModel != null && userModel!.habitDetails.isNotEmpty
         ? SizedBox(
-            height: ((MediaQuery.of(context).size.height) - ((AppBar().preferredSize.height) * 2)) / 2,
+      height: ((MediaQuery.of(context).size.height) - ((AppBar().preferredSize.height) * 4)) / 2,
             child: ListView.builder(
               itemCount: userModel!.habitDetails.length,
-              padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
               itemBuilder: (context, index) {
                 return GestureDetector(
                   onTap: () {
@@ -93,10 +108,11 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget showBreakHabitTiles() {
     return userModel != null && userModel!.habitBreakDetails.isNotEmpty
         ? SizedBox(
-            height: ((MediaQuery.of(context).size.height) - ((AppBar().preferredSize.height) * 2)) / 2,
+      height: ((MediaQuery.of(context).size.height) - ((AppBar().preferredSize.height) * 4)) / 2,
             child: ListView.builder(
               itemCount: userModel!.habitBreakDetails.length,
-              padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
               itemBuilder: (context, index) {
                 return GestureDetector(
                   onTap: () {
@@ -241,7 +257,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     style: const TextStyle(fontSize: 28),
                                   ),
                                   Text(
-                                    userModel!.habitDetails[index]["type"] == "make" ? "Done!" : "No more!",
+                                    getDoneText(index, isHabitMake),
                                     style: TextStyle(
                                       fontSize: 16,
                                       color: getTextColor(index, isHabitMake), // update
@@ -383,6 +399,14 @@ class _HomeScreenState extends State<HomeScreen> {
               (userModel!.habitBreakDetails[index]["goal"]))
           ? Colors.black87
           : Colors.transparent;
+    }
+  }
+
+  String getDoneText(int index, bool isHabitMake) {
+    if (isHabitMake) {
+      return "Done!";
+    } else {
+      return "No more!";
     }
   }
 }
