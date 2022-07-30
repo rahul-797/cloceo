@@ -7,8 +7,10 @@ import 'package:you/utils/date_provider.dart';
 class CalenderScreen extends StatefulWidget {
   final UserModel userModel;
   final int index;
+  final bool isHabitMake;
 
-  const CalenderScreen({Key? key, required this.userModel, required this.index}) : super(key: key);
+  const CalenderScreen({Key? key, required this.userModel, required this.index, required this.isHabitMake})
+      : super(key: key);
 
   @override
   State<CalenderScreen> createState() => _CalenderScreenState();
@@ -21,11 +23,13 @@ class _CalenderScreenState extends State<CalenderScreen> {
   final kLastDay = DateTime.now();
   late UserModel userModel;
   late int index;
+  late bool isHabitMake;
 
   @override
   void initState() {
     userModel = widget.userModel;
     index = widget.index;
+    isHabitMake = widget.isHabitMake;
     super.initState();
   }
 
@@ -38,7 +42,7 @@ class _CalenderScreenState extends State<CalenderScreen> {
           child: Column(
             children: [
               Text(
-                userModel.habitDetails[index]["name"],
+                isHabitMake ? userModel.habitDetails[index]["name"] : userModel.habitBreakDetails[index]["name"],
                 style: const TextStyle(fontSize: 36),
               ),
               const SizedBox(height: 8),
@@ -52,10 +56,7 @@ class _CalenderScreenState extends State<CalenderScreen> {
                   ),
                   calendarBuilders: CalendarBuilders(
                     defaultBuilder: (context, dateTime, focusedDay) {
-                      String doneCount = (((userModel.habitRecords[index][getDateId(dateTime)]) != null) &&
-                              (userModel.habitRecords[index].containsKey(getDateId(dateTime))))
-                          ? userModel.habitRecords[index][getDateId(dateTime)].toString()
-                          : "0";
+                      String doneCount = getDoneCount(dateTime, isHabitMake);
                       return Center(
                         child: Badge(
                           badgeContent: Text(
@@ -70,7 +71,7 @@ class _CalenderScreenState extends State<CalenderScreen> {
                             width: 32,
                             height: 32,
                             decoration: BoxDecoration(
-                              color: dateColor(int.parse(doneCount)),
+                              color: dateColor(int.parse(doneCount), isHabitMake),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Center(
@@ -98,12 +99,35 @@ class _CalenderScreenState extends State<CalenderScreen> {
     );
   }
 
-  Color dateColor(int doneCount) {
-    if (doneCount == 0) {
+  Color dateColor(int doneCount, bool isHabitMake) {
+    if (isHabitMake) {
+      if (doneCount == 0) {
+        return Colors.red;
+      } else if (doneCount < userModel.habitDetails[index]["goal"]) {
+        return Colors.orange;
+      }
+      return Colors.green;
+    } else {
+      if (doneCount < userModel.habitBreakDetails[index]["goal"]) {
+        return Colors.green;
+      } else if (doneCount == userModel.habitBreakDetails[index]["goal"]) {
+        return Colors.orange;
+      }
       return Colors.red;
-    } else if (doneCount < userModel.habitDetails[index]["goal"]) {
-      return Colors.orange;
     }
-    return Colors.green;
+  }
+
+  String getDoneCount(DateTime dateTime, bool isHabitMake) {
+    if (isHabitMake) {
+      return (((userModel.habitRecords[index][getDateId(dateTime)]) != null) &&
+              (userModel.habitRecords[index].containsKey(getDateId(dateTime))))
+          ? userModel.habitRecords[index][getDateId(dateTime)].toString()
+          : "0";
+    } else {
+      return (((userModel.habitBreakRecords[index][getDateId(dateTime)]) != null) &&
+              (userModel.habitBreakRecords[index].containsKey(getDateId(dateTime))))
+          ? userModel.habitBreakRecords[index][getDateId(dateTime)].toString()
+          : "0";
+    }
   }
 }

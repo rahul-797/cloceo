@@ -12,8 +12,10 @@ class AddEditScreen extends StatefulWidget {
   final UserModel? userModel;
   final int? index;
   final bool isAdding;
+  final bool? isHabitMake;
 
-  const AddEditScreen({Key? key, required this.userModel, this.index, required this.isAdding}) : super(key: key);
+  const AddEditScreen({Key? key, required this.userModel, this.index, required this.isAdding, this.isHabitMake})
+      : super(key: key);
 
   @override
   State<AddEditScreen> createState() => _AddEditScreenState();
@@ -27,6 +29,8 @@ class _AddEditScreenState extends State<AddEditScreen> {
   int repetition = 1;
   int goal = 1;
   String type = "make";
+  late bool isAdding;
+  late bool? isHabitMake;
   late String date;
   late String dateWithApos;
   List<int> countingInt = List.generate(30, (i) => i + 1);
@@ -34,19 +38,32 @@ class _AddEditScreenState extends State<AddEditScreen> {
 
   @override
   void initState() {
+    isAdding = widget.isAdding;
+    isHabitMake = widget.isHabitMake;
     date = getDateId(DateTime.now());
     dateWithApos = "\"$date\"";
     if (widget.userModel != null) {
       userModel = widget.userModel!;
       index = widget.index ?? 0;
-      if (userModel.habitDetails.isNotEmpty && !widget.isAdding) {
-        name = userModel.habitDetails[index]["name"];
-        goal = userModel.habitDetails[index]["goal"];
-        type = userModel.habitDetails[index]["type"];
-        repetition = userModel.habitDetails[index]["repetition"];
+      if (isHabitMake != null) {
+        if (isHabitMake!) {
+          if (userModel.habitDetails.isNotEmpty && !isAdding) {
+            name = userModel.habitDetails[index]["name"];
+            goal = userModel.habitDetails[index]["goal"];
+            type = userModel.habitDetails[index]["type"];
+            repetition = userModel.habitDetails[index]["repetition"];
+          }
+        } else {
+          if (userModel.habitBreakDetails.isNotEmpty && !isAdding) {
+            name = userModel.habitBreakDetails[index]["name"];
+            goal = userModel.habitBreakDetails[index]["goal"];
+            type = userModel.habitBreakDetails[index]["type"];
+            repetition = userModel.habitBreakDetails[index]["repetition"];
+          }
+        }
       }
     } else {
-      userModel = UserModel(habitDetails: [], habitRecords: []);
+      userModel = UserModel(habitDetails: [], habitRecords: [], habitBreakDetails: [], habitBreakRecords: []);
     }
     super.initState();
   }
@@ -61,8 +78,13 @@ class _AddEditScreenState extends State<AddEditScreen> {
             actions: [
               ElevatedButton(
                 onPressed: () {
-                  userModel.habitDetails.removeAt(index);
-                  userModel.habitRecords.removeAt(index);
+                  if (isHabitMake!) {
+                    userModel.habitDetails.removeAt(index);
+                    userModel.habitRecords.removeAt(index);
+                  } else {
+                    userModel.habitBreakDetails.removeAt(index);
+                    userModel.habitBreakRecords.removeAt(index);
+                  }
                   update(userModel);
                   Get.offAll(() => const HomeScreen());
                 },
@@ -90,9 +112,9 @@ class _AddEditScreenState extends State<AddEditScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: widget.isAdding ? const Text("Add habit") : const Text("Edit habit"),
+        title: isAdding ? const Text("Add habit") : const Text("Edit habit"),
         actions: [
-          !(widget.isAdding)
+          !isAdding
               ? IconButton(
                   onPressed: () {
                     showDeleteConfirmDialog();
@@ -120,7 +142,7 @@ class _AddEditScreenState extends State<AddEditScreen> {
                       ),
                       const SizedBox(height: 10),
                       TextFormField(
-                        initialValue: widget.isAdding ? "" : userModel.habitDetails[index]['name'],
+                        initialValue: getInitialName(index, isHabitMake),
                         keyboardType: TextInputType.text,
                         maxLines: 1,
                         validator: (str) => str == "" ? "* Can not be blank" : null,
@@ -219,21 +241,42 @@ class _AddEditScreenState extends State<AddEditScreen> {
           ElevatedButton(
             onPressed: () {
               if (_formKey.currentState!.validate()) {
-                if (widget.isAdding) {
-                  userModel.habitDetails.add({
-                    "name": name,
-                    "goal": goal,
-                    "type": type,
-                    "repetition": repetition,
-                  });
-                  userModel.habitRecords.add({});
+                if (isAdding) {
+                  // add new habit
+                  if (type == "make") {
+                    userModel.habitDetails.add({
+                      "name": name,
+                      "goal": goal,
+                      "type": type,
+                      "repetition": repetition,
+                    });
+                    userModel.habitRecords.add({});
+                  } else {
+                    userModel.habitBreakDetails.add({
+                      "name": name,
+                      "goal": goal,
+                      "type": type,
+                      "repetition": repetition,
+                    });
+                    userModel.habitBreakRecords.add({});
+                  }
                 } else {
-                  userModel.habitDetails[index] = {
-                    "name": name,
-                    "goal": goal,
-                    "type": type,
-                    "repetition": repetition,
-                  };
+                  // update habit
+                  if (type == "make") {
+                    userModel.habitDetails[index] = {
+                      "name": name,
+                      "goal": goal,
+                      "type": type,
+                      "repetition": repetition,
+                    };
+                  } else {
+                    userModel.habitBreakDetails[index] = {
+                      "name": name,
+                      "goal": goal,
+                      "type": type,
+                      "repetition": repetition,
+                    };
+                  }
                 }
                 update(userModel);
                 Get.offAll(() => const HomeScreen());
@@ -260,5 +303,17 @@ class _AddEditScreenState extends State<AddEditScreen> {
         .collection('users')
         .doc(FirebaseAuth.instance.currentUser!.email)
         .set(userModel.toJson());
+  }
+
+  String getInitialName(int index, bool? isHabitMake) {
+    if (isHabitMake != null) {
+      if (isHabitMake) {
+        return isAdding ? "" : userModel.habitDetails[index]['name'];
+      } else {
+        return isAdding ? "" : userModel.habitBreakDetails[index]['name'];
+      }
+    } else {
+      return "";
+    }
   }
 }

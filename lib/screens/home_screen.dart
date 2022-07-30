@@ -48,44 +48,79 @@ class _HomeScreenState extends State<HomeScreen> {
         },
         child: const Icon(Icons.add),
       ),
-      body: isLoading ? const Center(child: CircularProgressIndicator()) : showHabitTiles(),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                showMakeHabitTiles(),
+                showBreakHabitTiles(),
+              ],
+            ),
     );
   }
 
-  Widget showHabitTiles() {
+  Widget showMakeHabitTiles() {
     return userModel != null && userModel!.habitDetails.isNotEmpty
-        ? ListView.builder(
-      itemCount: userModel!.habitDetails.length,
-            shrinkWrap: true,
-            padding: const EdgeInsets.fromLTRB(0, 24, 0, 0),
-            itemBuilder: (context, index) {
-              return GestureDetector(
-                onTap: () {
-                  showBottomSheet(index);
-                },
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 24),
+        ? SizedBox(
+            height: ((MediaQuery.of(context).size.height) - ((AppBar().preferredSize.height) * 2)) / 2,
+            child: ListView.builder(
+              itemCount: userModel!.habitDetails.length,
+              padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+              itemBuilder: (context, index) {
+                return GestureDetector(
+                  onTap: () {
+                    showBottomSheet(index, true); // "make" habits are sent as true
+                  },
                   child: Card(
+                    elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: ListTile(
-                      title: Text(
-                        userModel!.habitDetails[index]['name'],
-                        style: const TextStyle(fontSize: 20),
-                      ),
+                      title: Text(userModel!.habitDetails[index]["name"]),
                       trailing: Text(
                           "${userModel!.habitRecords[index][getDateId(dateTime)] ?? "0"}/${userModel!.habitDetails[index]["goal"]}"),
                     ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           )
         : const Center(child: Text("Create first habit"));
   }
 
-  showBottomSheet(int index) {
+  Widget showBreakHabitTiles() {
+    return userModel != null && userModel!.habitBreakDetails.isNotEmpty
+        ? SizedBox(
+            height: ((MediaQuery.of(context).size.height) - ((AppBar().preferredSize.height) * 2)) / 2,
+            child: ListView.builder(
+              itemCount: userModel!.habitBreakDetails.length,
+              padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+              itemBuilder: (context, index) {
+                return GestureDetector(
+                  onTap: () {
+                    showBottomSheet(index, false); // "break" habits are sent as false
+                  },
+                  child: Card(
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: ListTile(
+                      title: Text(userModel!.habitBreakDetails[index]["name"]),
+                      trailing: Text(
+                          "${userModel!.habitBreakRecords[index][getDateId(dateTime)] ?? "0"}/${userModel!.habitBreakDetails[index]["goal"]}"),
+                    ),
+                  ),
+                );
+              },
+            ),
+          )
+        : const Center(child: Text("Create first habit"));
+  }
+
+  showBottomSheet(int index, bool isHabitMake) {
     Get.bottomSheet(
       Wrap(
         children: [
@@ -121,13 +156,19 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: IconButton(
                               onPressed: () {
                                 Navigator.pop(context);
-                                Get.to(() => CalenderScreen(userModel: userModel!, index: index));
+                                Get.to(() => CalenderScreen(
+                                      userModel: userModel!,
+                                      index: index,
+                                      isHabitMake: isHabitMake,
+                                    ));
                               },
                               icon: const Icon(Icons.calendar_month_rounded)),
                         ),
                         Expanded(
                           child: Text(
-                            userModel!.habitDetails[index]["name"],
+                            isHabitMake
+                                ? userModel!.habitDetails[index]["name"]
+                                : userModel!.habitBreakDetails[index]["name"],
                             style: const TextStyle(fontSize: 28),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -139,7 +180,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: IconButton(
                               onPressed: () async {
                                 Navigator.pop(context);
-                                Get.to(() => AddEditScreen(userModel: userModel, isAdding: false, index: index));
+                                Get.to(() => AddEditScreen(
+                                    userModel: userModel, isAdding: false, index: index, isHabitMake: isHabitMake));
                               },
                               icon: const Icon(Icons.edit)),
                         ),
@@ -158,12 +200,22 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           IconButton(
                             onPressed: () {
-                              if (userModel!.habitRecords[index].containsKey(getDateId(dateTime))) {
-                                if (userModel!.habitRecords[index][getDateId(dateTime)] > 0) {
-                                  userModel!.habitRecords[index][getDateId(dateTime)] -= 1;
+                              if (isHabitMake) {
+                                if (userModel!.habitRecords[index].containsKey(getDateId(dateTime))) {
+                                  if (userModel!.habitRecords[index][getDateId(dateTime)] > 0) {
+                                    userModel!.habitRecords[index][getDateId(dateTime)] -= 1;
+                                  }
+                                } else {
+                                  userModel!.habitRecords[index][getDateId(dateTime)] = 0;
                                 }
                               } else {
-                                userModel!.habitRecords[index][getDateId(dateTime)] = 0;
+                                if (userModel!.habitBreakRecords[index].containsKey(getDateId(dateTime))) {
+                                  if (userModel!.habitBreakRecords[index][getDateId(dateTime)] > 0) {
+                                    userModel!.habitBreakRecords[index][getDateId(dateTime)] -= 1;
+                                  }
+                                } else {
+                                  userModel!.habitBreakRecords[index][getDateId(dateTime)] = 0;
+                                }
                               }
                               update(userModel!);
                               setState(() {});
@@ -177,32 +229,22 @@ class _HomeScreenState extends State<HomeScreen> {
                             width: MediaQuery.of(context).size.width * 0.5,
                             height: MediaQuery.of(context).size.width * 0.5,
                             child: SleekCircularSlider(
-                              initialValue: userModel!.habitRecords[index][getDateId(dateTime)] != null
-                                  ? double.parse(userModel!.habitRecords[index][getDateId(dateTime)].toString())
-                                  : 0.0,
+                              initialValue: getInitialValue(index, isHabitMake),
                               min: 0,
-                              max: ((userModel!.habitRecords[index][getDateId(dateTime)] ?? 0) >
-                                      (userModel!.habitDetails[index]["goal"]))
-                                  ? double.parse(userModel!.habitRecords[index][getDateId(dateTime)].toString())
-                                  : double.parse(userModel!.habitDetails[index]["goal"].toString()),
+                              max: getMaxValue(index, isHabitMake),
                               innerWidget: (_) => Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Text(
-                                    userModel!.habitRecords[index][getDateId(dateTime)] != null
-                                        ? userModel!.habitRecords[index][getDateId(dateTime)].toString()
-                                        : "0",
+                                    getSliderText(index, isHabitMake),
                                     style: const TextStyle(fontSize: 28),
                                   ),
                                   Text(
                                     userModel!.habitDetails[index]["type"] == "make" ? "Done!" : "No more!",
                                     style: TextStyle(
                                       fontSize: 16,
-                                      color: ((userModel!.habitRecords[index][getDateId(dateTime)] ?? 0) >=
-                                              (userModel!.habitDetails[index]["goal"]))
-                                          ? Colors.black87
-                                          : Colors.transparent, // update
+                                      color: getTextColor(index, isHabitMake), // update
                                     ),
                                   ),
                                 ],
@@ -221,10 +263,18 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           IconButton(
                             onPressed: () {
-                              if (userModel!.habitRecords[index].containsKey(getDateId(dateTime))) {
-                                userModel!.habitRecords[index][getDateId(dateTime)] += 1;
+                              if (isHabitMake) {
+                                if (userModel!.habitRecords[index].containsKey(getDateId(dateTime))) {
+                                  userModel!.habitRecords[index][getDateId(dateTime)] += 1;
+                                } else {
+                                  userModel!.habitRecords[index][getDateId(dateTime)] = 1;
+                                }
                               } else {
-                                userModel!.habitRecords[index][getDateId(dateTime)] = 1;
+                                if (userModel!.habitBreakRecords[index].containsKey(getDateId(dateTime))) {
+                                  userModel!.habitBreakRecords[index][getDateId(dateTime)] += 1;
+                                } else {
+                                  userModel!.habitBreakRecords[index][getDateId(dateTime)] = 1;
+                                }
                               }
                               update(userModel!);
                               setState(() {});
@@ -284,5 +334,55 @@ class _HomeScreenState extends State<HomeScreen> {
         .collection('users')
         .doc(FirebaseAuth.instance.currentUser!.email)
         .set(userModel.toJson());
+  }
+
+  double getInitialValue(int index, bool isHabitMake) {
+    if (isHabitMake) {
+      return userModel!.habitRecords[index][getDateId(dateTime)] != null
+          ? double.parse(userModel!.habitRecords[index][getDateId(dateTime)].toString())
+          : 0.0;
+    } else {
+      return userModel!.habitBreakRecords[index][getDateId(dateTime)] != null
+          ? double.parse(userModel!.habitBreakRecords[index][getDateId(dateTime)].toString())
+          : 0.0;
+    }
+  }
+
+  double getMaxValue(int index, bool isHabitMake) {
+    if (isHabitMake) {
+      return ((userModel!.habitRecords[index][getDateId(dateTime)] ?? 0) > (userModel!.habitDetails[index]["goal"]))
+          ? double.parse(userModel!.habitRecords[index][getDateId(dateTime)].toString())
+          : double.parse(userModel!.habitDetails[index]["goal"].toString());
+    } else {
+      return ((userModel!.habitBreakRecords[index][getDateId(dateTime)] ?? 0) >
+              (userModel!.habitBreakDetails[index]["goal"]))
+          ? double.parse(userModel!.habitBreakRecords[index][getDateId(dateTime)].toString())
+          : double.parse(userModel!.habitBreakDetails[index]["goal"].toString());
+    }
+  }
+
+  String getSliderText(int index, bool isHabitMake) {
+    if (isHabitMake) {
+      return userModel!.habitRecords[index][getDateId(dateTime)] != null
+          ? userModel!.habitRecords[index][getDateId(dateTime)].toString()
+          : "0";
+    } else {
+      return userModel!.habitBreakRecords[index][getDateId(dateTime)] != null
+          ? userModel!.habitBreakRecords[index][getDateId(dateTime)].toString()
+          : "0";
+    }
+  }
+
+  Color getTextColor(int index, bool isHabitMake) {
+    if (isHabitMake) {
+      return ((userModel!.habitRecords[index][getDateId(dateTime)] ?? 0) >= (userModel!.habitDetails[index]["goal"]))
+          ? Colors.black87
+          : Colors.transparent;
+    } else {
+      return ((userModel!.habitBreakRecords[index][getDateId(dateTime)] ?? 0) >=
+              (userModel!.habitBreakDetails[index]["goal"]))
+          ? Colors.black87
+          : Colors.transparent;
+    }
   }
 }

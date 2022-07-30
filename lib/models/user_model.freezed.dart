@@ -28,6 +28,14 @@ mixin _$UserModel {
 
   set habitRecords(List<Map<String, dynamic>> value) => throw _privateConstructorUsedError;
 
+  List<Map<String, dynamic>> get habitBreakDetails => throw _privateConstructorUsedError;
+
+  set habitBreakDetails(List<Map<String, dynamic>> value) => throw _privateConstructorUsedError;
+
+  List<Map<String, dynamic>> get habitBreakRecords => throw _privateConstructorUsedError;
+
+  set habitBreakRecords(List<Map<String, dynamic>> value) => throw _privateConstructorUsedError;
+
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
@@ -38,7 +46,11 @@ mixin _$UserModel {
 abstract class $UserModelCopyWith<$Res> {
   factory $UserModelCopyWith(UserModel value, $Res Function(UserModel) then) = _$UserModelCopyWithImpl<$Res>;
 
-  $Res call({List<Map<String, dynamic>> habitDetails, List<Map<String, dynamic>> habitRecords});
+  $Res call(
+      {List<Map<String, dynamic>> habitDetails,
+      List<Map<String, dynamic>> habitRecords,
+      List<Map<String, dynamic>> habitBreakDetails,
+      List<Map<String, dynamic>> habitBreakRecords});
 }
 
 /// @nodoc
@@ -46,7 +58,6 @@ class _$UserModelCopyWithImpl<$Res> implements $UserModelCopyWith<$Res> {
   _$UserModelCopyWithImpl(this._value, this._then);
 
   final UserModel _value;
-
   // ignore: unused_field
   final $Res Function(UserModel) _then;
 
@@ -54,6 +65,8 @@ class _$UserModelCopyWithImpl<$Res> implements $UserModelCopyWith<$Res> {
   $Res call({
     Object? habitDetails = freezed,
     Object? habitRecords = freezed,
+    Object? habitBreakDetails = freezed,
+    Object? habitBreakRecords = freezed,
   }) {
     return _then(_value.copyWith(
       habitDetails: habitDetails == freezed
@@ -63,6 +76,14 @@ class _$UserModelCopyWithImpl<$Res> implements $UserModelCopyWith<$Res> {
       habitRecords: habitRecords == freezed
           ? _value.habitRecords
           : habitRecords // ignore: cast_nullable_to_non_nullable
+              as List<Map<String, dynamic>>,
+      habitBreakDetails: habitBreakDetails == freezed
+          ? _value.habitBreakDetails
+          : habitBreakDetails // ignore: cast_nullable_to_non_nullable
+              as List<Map<String, dynamic>>,
+      habitBreakRecords: habitBreakRecords == freezed
+          ? _value.habitBreakRecords
+          : habitBreakRecords // ignore: cast_nullable_to_non_nullable
               as List<Map<String, dynamic>>,
     ));
   }
@@ -74,7 +95,11 @@ abstract class _$$_UserModelCopyWith<$Res> implements $UserModelCopyWith<$Res> {
       __$$_UserModelCopyWithImpl<$Res>;
 
   @override
-  $Res call({List<Map<String, dynamic>> habitDetails, List<Map<String, dynamic>> habitRecords});
+  $Res call(
+      {List<Map<String, dynamic>> habitDetails,
+      List<Map<String, dynamic>> habitRecords,
+      List<Map<String, dynamic>> habitBreakDetails,
+      List<Map<String, dynamic>> habitBreakRecords});
 }
 
 /// @nodoc
@@ -89,6 +114,8 @@ class __$$_UserModelCopyWithImpl<$Res> extends _$UserModelCopyWithImpl<$Res> imp
   $Res call({
     Object? habitDetails = freezed,
     Object? habitRecords = freezed,
+    Object? habitBreakDetails = freezed,
+    Object? habitBreakRecords = freezed,
   }) {
     return _then(_$_UserModel(
       habitDetails: habitDetails == freezed
@@ -99,6 +126,14 @@ class __$$_UserModelCopyWithImpl<$Res> extends _$UserModelCopyWithImpl<$Res> imp
           ? _value.habitRecords
           : habitRecords // ignore: cast_nullable_to_non_nullable
               as List<Map<String, dynamic>>,
+      habitBreakDetails: habitBreakDetails == freezed
+          ? _value.habitBreakDetails
+          : habitBreakDetails // ignore: cast_nullable_to_non_nullable
+              as List<Map<String, dynamic>>,
+      habitBreakRecords: habitBreakRecords == freezed
+          ? _value.habitBreakRecords
+          : habitBreakRecords // ignore: cast_nullable_to_non_nullable
+              as List<Map<String, dynamic>>,
     ));
   }
 }
@@ -106,7 +141,11 @@ class __$$_UserModelCopyWithImpl<$Res> extends _$UserModelCopyWithImpl<$Res> imp
 /// @nodoc
 @JsonSerializable()
 class _$_UserModel implements _UserModel {
-  _$_UserModel({required this.habitDetails, required this.habitRecords});
+  _$_UserModel(
+      {required this.habitDetails,
+      required this.habitRecords,
+      required this.habitBreakDetails,
+      required this.habitBreakRecords});
 
   factory _$_UserModel.fromJson(Map<String, dynamic> json) => _$$_UserModelFromJson(json);
 
@@ -114,10 +153,14 @@ class _$_UserModel implements _UserModel {
   List<Map<String, dynamic>> habitDetails;
   @override
   List<Map<String, dynamic>> habitRecords;
+  @override
+  List<Map<String, dynamic>> habitBreakDetails;
+  @override
+  List<Map<String, dynamic>> habitBreakRecords;
 
   @override
   String toString() {
-    return 'UserModel(habitDetails: $habitDetails, habitRecords: $habitRecords)';
+    return 'UserModel(habitDetails: $habitDetails, habitRecords: $habitRecords, habitBreakDetails: $habitBreakDetails, habitBreakRecords: $habitBreakRecords)';
   }
 
   @JsonKey(ignore: true)
@@ -135,7 +178,9 @@ class _$_UserModel implements _UserModel {
 abstract class _UserModel implements UserModel {
   factory _UserModel(
       {required List<Map<String, dynamic>> habitDetails,
-      required List<Map<String, dynamic>> habitRecords}) = _$_UserModel;
+      required List<Map<String, dynamic>> habitRecords,
+      required List<Map<String, dynamic>> habitBreakDetails,
+      required List<Map<String, dynamic>> habitBreakRecords}) = _$_UserModel;
 
   factory _UserModel.fromJson(Map<String, dynamic> json) = _$_UserModel.fromJson;
 
@@ -148,6 +193,16 @@ abstract class _UserModel implements UserModel {
   List<Map<String, dynamic>> get habitRecords;
 
   set habitRecords(List<Map<String, dynamic>> value);
+
+  @override
+  List<Map<String, dynamic>> get habitBreakDetails;
+
+  set habitBreakDetails(List<Map<String, dynamic>> value);
+
+  @override
+  List<Map<String, dynamic>> get habitBreakRecords;
+
+  set habitBreakRecords(List<Map<String, dynamic>> value);
 
   @override
   @JsonKey(ignore: true)

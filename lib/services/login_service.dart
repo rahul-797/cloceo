@@ -41,13 +41,17 @@ class LoginService {
                         FirebaseFirestore.instance
                             .collection('users')
                             .doc(FirebaseAuth.instance.currentUser!.email)
-                            .set(UserModel(habitDetails: [], habitRecords: []).toJson())
+                            .set(UserModel(
+                                habitDetails: [],
+                                habitRecords: [],
+                                habitBreakDetails: [],
+                                habitBreakRecords: []).toJson())
                       }
                   });
         } catch (e) {
           print(e);
         }
-        Get.to(() => const HomeScreen());
+        Get.offAll(() => const HomeScreen());
       } catch (e) {
         print(e);
       }
