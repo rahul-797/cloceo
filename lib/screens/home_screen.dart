@@ -1,13 +1,17 @@
+import 'package:badges/badges.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:sleek_circular_slider/sleek_circular_slider.dart';
+import 'package:table_calendar/table_calendar.dart';
 import 'package:you/models/user_model.dart';
 import 'package:you/screens/add_edit_screen.dart';
 import 'package:you/screens/calender_screen.dart';
 import 'package:you/services/login_service.dart';
 import 'package:you/utils/date_provider.dart';
+import 'package:you/utils/startday_provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -22,10 +26,19 @@ class _HomeScreenState extends State<HomeScreen> {
   late DateTime dateTime;
   bool isLoading = true;
 
+  final CalendarFormat _calendarFormat = CalendarFormat.week;
+  final DateTime _focusedDay = DateTime.now();
+  final kFirstDay = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day - 6);
+  final kLastDay = DateTime.now();
+  late String startDay;
+  late StartingDayOfWeek startingDayOfWeek;
+
   @override
   void initState() {
-    fetchData();
     dateTime = DateTime.now();
+    startDay = (DateFormat('EEEE').format(kFirstDay)).toLowerCase();
+    startingDayOfWeek = startDayProvider(startDay);
+    fetchData();
     super.initState();
   }
 
@@ -50,90 +63,193 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
-          : Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                  child: Text(
-                    "Habits to make",
-                    style: TextStyle(fontSize: 18),
+          : SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                    child: Text(
+                      "Habits to make",
+                      style: TextStyle(fontSize: 18),
+                    ),
                   ),
-                ),
-                showMakeHabitTiles(),
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                  child: Text(
-                    "Habits to break",
-                    style: TextStyle(fontSize: 18),
+                  showMakeHabitTiles(),
+                  const Divider(),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                    child: Text(
+                      "Habits to break",
+                      style: TextStyle(fontSize: 18),
+                    ),
                   ),
-                ),
-                showBreakHabitTiles(),
-              ],
+                  showBreakHabitTiles(),
+                ],
+              ),
             ),
     );
   }
 
   Widget showMakeHabitTiles() {
     return userModel != null && userModel!.habitDetails.isNotEmpty
-        ? SizedBox(
-      height: ((MediaQuery.of(context).size.height) - ((AppBar().preferredSize.height) * 4)) / 2,
-            child: ListView.builder(
-              itemCount: userModel!.habitDetails.length,
-              physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-              itemBuilder: (context, index) {
-                return GestureDetector(
-                  onTap: () {
-                    showBottomSheet(index, true); // "make" habits are sent as true
-                  },
-                  child: Card(
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: ListTile(
-                      title: Text(userModel!.habitDetails[index]["name"]),
-                      trailing: Text(
-                          "${userModel!.habitRecords[index][getDateId(dateTime)] ?? "0"}/${userModel!.habitDetails[index]["goal"]}"),
-                    ),
+        ? ListView.builder(
+            itemCount: userModel!.habitDetails.length,
+            physics: const NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+            itemBuilder: (context, index) {
+              return GestureDetector(
+                onTap: () {
+                  showBottomSheet(index, true); // "make" habits are sent as true
+                },
+                child: Card(
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
                   ),
-                );
-              },
-            ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 8),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Text(
+                          userModel!.habitDetails[index]["name"],
+                          style: const TextStyle(fontSize: 20),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 8),
+                        child: showCalender(index, true),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
           )
         : const Center(child: Text("Create first habit"));
   }
 
   Widget showBreakHabitTiles() {
     return userModel != null && userModel!.habitBreakDetails.isNotEmpty
-        ? SizedBox(
-      height: ((MediaQuery.of(context).size.height) - ((AppBar().preferredSize.height) * 4)) / 2,
-            child: ListView.builder(
-              itemCount: userModel!.habitBreakDetails.length,
-              physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-              itemBuilder: (context, index) {
-                return GestureDetector(
-                  onTap: () {
-                    showBottomSheet(index, false); // "break" habits are sent as false
-                  },
-                  child: Card(
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: ListTile(
-                      title: Text(userModel!.habitBreakDetails[index]["name"]),
-                      trailing: Text(
-                          "${userModel!.habitBreakRecords[index][getDateId(dateTime)] ?? "0"}/${userModel!.habitBreakDetails[index]["goal"]}"),
-                    ),
+        ? ListView.builder(
+            itemCount: userModel!.habitBreakDetails.length,
+            physics: const NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+            itemBuilder: (context, index) {
+              return GestureDetector(
+                onTap: () {
+                  showBottomSheet(index, false); // "break" habits are sent as false
+                },
+                child: Card(
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
                   ),
-                );
-              },
-            ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 8),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Text(
+                          userModel!.habitBreakDetails[index]["name"],
+                          style: const TextStyle(fontSize: 20),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 8),
+                        child: showCalender(index, false),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
           )
         : const Center(child: Text("Create first habit"));
+  }
+
+  Widget showCalender(int index, bool isHabitMake) {
+    return TableCalendar(
+      availableGestures: AvailableGestures.none,
+      headerVisible: false,
+      daysOfWeekVisible: false,
+      calendarStyle: const CalendarStyle(
+        isTodayHighlighted: false,
+      ),
+      calendarBuilders: CalendarBuilders(
+        defaultBuilder: (context, dateTime, focusedDay) {
+          String doneCount = getDoneCount(dateTime, index, isHabitMake);
+          return Center(
+            child: Badge(
+              badgeContent: Text(
+                doneCount,
+                style: const TextStyle(color: Colors.black87, fontSize: 12),
+              ),
+              elevation: 0,
+              badgeColor: Colors.white,
+              padding: const EdgeInsets.all(3),
+              position: BadgePosition.bottomEnd(),
+              child: Container(
+                width: 20,
+                height: 20,
+                decoration: BoxDecoration(
+                  color: dateColor(int.parse(doneCount), index, isHabitMake),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Center(
+                  child: Text(
+                    dateTime.day.toString(),
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+      firstDay: kFirstDay,
+      lastDay: kLastDay,
+      focusedDay: _focusedDay,
+      calendarFormat: _calendarFormat,
+      startingDayOfWeek: startingDayOfWeek,
+    );
+  }
+
+  Color dateColor(int doneCount, int index, bool isHabitMake) {
+    if (isHabitMake) {
+      if (doneCount == 0) {
+        return Colors.grey;
+      } else if (doneCount < userModel!.habitDetails[index]["goal"]) {
+        return Colors.orange;
+      }
+      return Colors.green;
+    } else {
+      if (doneCount == 0) {
+        return Colors.green;
+      } else if (doneCount <= userModel!.habitBreakDetails[index]["goal"]) {
+        return Colors.orange;
+      }
+      return Colors.redAccent;
+    }
+  }
+
+  String getDoneCount(DateTime dateTime, int index, isHabitMake) {
+    if (isHabitMake) {
+      return (((userModel!.habitRecords[index][getDateId(dateTime)]) != null) &&
+              (userModel!.habitRecords[index].containsKey(getDateId(dateTime))))
+          ? userModel!.habitRecords[index][getDateId(dateTime)].toString()
+          : "0";
+    } else {
+      return (((userModel!.habitBreakRecords[index][getDateId(dateTime)]) != null) &&
+              (userModel!.habitBreakRecords[index].containsKey(getDateId(dateTime))))
+          ? userModel!.habitBreakRecords[index][getDateId(dateTime)].toString()
+          : "0";
+    }
   }
 
   showBottomSheet(int index, bool isHabitMake) {
@@ -173,10 +289,10 @@ class _HomeScreenState extends State<HomeScreen> {
                               onPressed: () {
                                 Navigator.pop(context);
                                 Get.to(() => CalenderScreen(
-                                      userModel: userModel!,
-                                      index: index,
-                                      isHabitMake: isHabitMake,
-                                    ));
+                                  userModel: userModel!,
+                                  index: index,
+                                  isHabitMake: isHabitMake,
+                                ));
                               },
                               icon: const Icon(Icons.calendar_month_rounded)),
                         ),
@@ -371,7 +487,7 @@ class _HomeScreenState extends State<HomeScreen> {
           : double.parse(userModel!.habitDetails[index]["goal"].toString());
     } else {
       return ((userModel!.habitBreakRecords[index][getDateId(dateTime)] ?? 0) >
-              (userModel!.habitBreakDetails[index]["goal"]))
+          (userModel!.habitBreakDetails[index]["goal"]))
           ? double.parse(userModel!.habitBreakRecords[index][getDateId(dateTime)].toString())
           : double.parse(userModel!.habitBreakDetails[index]["goal"].toString());
     }
@@ -396,7 +512,7 @@ class _HomeScreenState extends State<HomeScreen> {
           : Colors.transparent;
     } else {
       return ((userModel!.habitBreakRecords[index][getDateId(dateTime)] ?? 0) >=
-              (userModel!.habitBreakDetails[index]["goal"]))
+          (userModel!.habitBreakDetails[index]["goal"]))
           ? Colors.black87
           : Colors.transparent;
     }

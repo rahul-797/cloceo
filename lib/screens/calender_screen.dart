@@ -102,15 +102,15 @@ class _CalenderScreenState extends State<CalenderScreen> {
   Color dateColor(int doneCount, bool isHabitMake) {
     if (isHabitMake) {
       if (doneCount == 0) {
-        return Colors.red;
+        return Colors.grey;
       } else if (doneCount < userModel.habitDetails[index]["goal"]) {
         return Colors.orange;
       }
       return Colors.green;
     } else {
-      if (doneCount < userModel.habitBreakDetails[index]["goal"]) {
+      if (doneCount == 0) {
         return Colors.green;
-      } else if (doneCount == userModel.habitBreakDetails[index]["goal"]) {
+      } else if (doneCount <= userModel.habitBreakDetails[index]["goal"]) {
         return Colors.orange;
       }
       return Colors.red;
