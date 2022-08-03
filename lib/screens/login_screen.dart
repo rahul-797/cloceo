@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:you/services/login_service.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -10,12 +11,25 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final LoginService loginService = LoginService.instance;
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          "Cloceo",
+          style: TextStyle(fontSize: 24),
+        ),
+      ),
       body: SafeArea(
-        child: _getContent(),
+        child: isLoading
+            ? const Center(
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                ),
+              )
+            : _getContent(),
       ),
     );
   }
@@ -45,14 +59,14 @@ class _LoginScreenState extends State<LoginScreen> {
   _getLoginButtons() {
     return OutlinedButton(
       style: OutlinedButton.styleFrom(
-        side: const BorderSide(color: Colors.black87),
+        side: const BorderSide(color: Colors.white),
         padding: const EdgeInsets.all(16),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Image.asset(
-            'assets/icons/google-icon.png',
+          SvgPicture.asset(
+            "assets/icons/google-icon.svg",
             width: 24,
           ),
           const SizedBox(
@@ -62,13 +76,15 @@ class _LoginScreenState extends State<LoginScreen> {
             'Sign in with Google',
             style: TextStyle(
               fontSize: 18,
-              color: Colors.black87,
+              color: Colors.white,
             ),
           ),
         ],
       ),
       onPressed: () {
         loginService.login();
+        isLoading = true;
+        setState(() {});
       },
     );
   }

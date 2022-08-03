@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart' show toBeginningOfSentenceCase;
 import 'package:you/models/user_model.dart';
 import 'package:you/screens/home_screen.dart';
+import 'package:you/utils/color_scheme.dart';
 import 'package:you/utils/date_provider.dart';
 
 class AddEditScreen extends StatefulWidget {
@@ -33,8 +34,32 @@ class _AddEditScreenState extends State<AddEditScreen> {
   late bool? isHabitMake;
   late String date;
   late String dateWithApos;
-  List<int> countingInt = List.generate(30, (i) => i + 1);
-  List<String> countingString = List.generate(30, (i) => "${i + 1}");
+  List<int> countingInt = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 100, 120, 150, 200];
+  List<String> countingString = [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10",
+    "15",
+    "20",
+    "25",
+    "30",
+    "40",
+    "50",
+    "60",
+    "70",
+    "80",
+    "100",
+    "120",
+    "150",
+    "200"
+  ];
 
   @override
   void initState() {
@@ -89,7 +114,10 @@ class _AddEditScreenState extends State<AddEditScreen> {
                   Get.offAll(() => const HomeScreen());
                 },
                 style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.redAccent)),
-                child: const Text('Yes'),
+                child: const Text(
+                  'Yes',
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
               const SizedBox(width: 6),
               ElevatedButton(
@@ -112,7 +140,9 @@ class _AddEditScreenState extends State<AddEditScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: isAdding ? const Text("Add habit") : const Text("Edit habit"),
+        title: isAdding
+            ? const Text("Add habit", style: TextStyle(fontSize: 24))
+            : const Text("Edit habit", style: TextStyle(fontSize: 24)),
         actions: [
           !isAdding
               ? IconButton(
@@ -136,10 +166,6 @@ class _AddEditScreenState extends State<AddEditScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const Text(
-                        "Name",
-                        style: TextStyle(fontSize: 16),
-                      ),
                       const SizedBox(height: 10),
                       TextFormField(
                         initialValue: getInitialName(index, isHabitMake),
@@ -148,10 +174,18 @@ class _AddEditScreenState extends State<AddEditScreen> {
                         validator: (str) => str == "" ? "* Can not be blank" : null,
                         decoration: InputDecoration(
                           hintText: "Habit name",
+                          hintStyle: TextStyle(color: Colors.grey.shade200),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(20),
+                            borderSide: const BorderSide(color: Colors.white),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20),
+                            borderSide: const BorderSide(color: Colors.white),
                           ),
                         ),
+                        keyboardAppearance: Brightness.dark,
+                        cursorColor: Colors.white,
                         onChanged: (str) {
                           str = toBeginningOfSentenceCase(str)!;
                           name = str;
@@ -168,16 +202,16 @@ class _AddEditScreenState extends State<AddEditScreen> {
                       CustomRadioButton(
                         elevation: 0,
                         width: 148,
-                        unSelectedColor: Colors.white,
-                        selectedColor: Colors.blue,
+                        unSelectedColor: kSecondaryTextLight,
+                        selectedColor: kPrimaryBackgroundLight,
                         defaultSelected: type,
                         enableShape: true,
                         padding: 6,
                         buttonLables: const ['Build a habit', 'Break a habit'],
                         buttonValues: const ["make", "break"],
                         buttonTextStyle: const ButtonTextStyle(
-                          selectedColor: Colors.white,
-                          unSelectedColor: Colors.black87,
+                          selectedColor: kPrimaryTextLight,
+                          unSelectedColor: kPrimaryBackgroundLight,
                           textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
                         ),
                         radioButtonValue: (value) => type = value.toString(),
@@ -193,16 +227,16 @@ class _AddEditScreenState extends State<AddEditScreen> {
                       CustomRadioButton(
                         elevation: 0,
                         width: ((MediaQuery.of(context).size.width) - 80) / 3,
-                        unSelectedColor: Colors.white,
-                        selectedColor: Colors.blue,
+                        unSelectedColor: kSecondaryTextLight,
+                        selectedColor: kPrimaryBackgroundLight,
                         defaultSelected: repetition,
                         enableShape: true,
                         padding: 6,
                         buttonLables: const ['Daily', 'Weekly', 'Monthly'],
                         buttonValues: const [1, 7, 30],
                         buttonTextStyle: const ButtonTextStyle(
-                          selectedColor: Colors.white,
-                          unSelectedColor: Colors.black87,
+                          selectedColor: kPrimaryTextLight,
+                          unSelectedColor: kPrimaryBackgroundLight,
                           textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
                         ),
                         radioButtonValue: (value) => repetition = int.parse(value.toString()),
@@ -218,16 +252,16 @@ class _AddEditScreenState extends State<AddEditScreen> {
                       CustomRadioButton(
                         elevation: 0,
                         width: 64,
-                        unSelectedColor: Colors.white,
-                        selectedColor: Colors.blue,
+                        unSelectedColor: kSecondaryTextLight,
+                        selectedColor: kPrimaryBackgroundLight,
                         defaultSelected: goal,
                         enableShape: true,
                         padding: 6,
                         buttonLables: countingString,
                         buttonValues: countingInt,
                         buttonTextStyle: const ButtonTextStyle(
-                          selectedColor: Colors.white,
-                          unSelectedColor: Colors.black87,
+                          selectedColor: kPrimaryTextLight,
+                          unSelectedColor: kPrimaryBackgroundLight,
                           textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
                         ),
                         radioButtonValue: (value) => goal = int.parse(value.toString()),
@@ -314,7 +348,7 @@ class _AddEditScreenState extends State<AddEditScreen> {
             child: const Center(
               child: Text(
                 "Save",
-                style: TextStyle(fontSize: 20),
+                style: TextStyle(fontSize: 20, color: Colors.white),
               ),
             ),
           ),

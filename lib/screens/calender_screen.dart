@@ -43,7 +43,9 @@ class _CalenderScreenState extends State<CalenderScreen> {
             children: [
               Text(
                 isHabitMake ? userModel.habitDetails[index]["name"] : userModel.habitBreakDetails[index]["name"],
-                style: const TextStyle(fontSize: 36),
+                style: const TextStyle(fontSize: 28),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: 8),
               Center(

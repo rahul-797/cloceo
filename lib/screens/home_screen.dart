@@ -10,6 +10,7 @@ import 'package:you/models/user_model.dart';
 import 'package:you/screens/add_edit_screen.dart';
 import 'package:you/screens/calender_screen.dart';
 import 'package:you/services/login_service.dart';
+import 'package:you/utils/color_scheme.dart';
 import 'package:you/utils/date_provider.dart';
 import 'package:you/utils/startday_provider.dart';
 
@@ -46,11 +47,14 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Cloceo"),
+        title: const Text(
+          "Cloceo",
+          style: TextStyle(fontSize: 24),
+        ),
         actions: [
           IconButton(
               onPressed: () {
-                loginService.logout();
+                showLogoutConfirmDialog();
               },
               icon: const Icon(Icons.logout)),
         ],
@@ -59,10 +63,14 @@ class _HomeScreenState extends State<HomeScreen> {
         onPressed: () {
           Get.to(() => AddEditScreen(isAdding: true, userModel: userModel));
         },
-        child: const Icon(Icons.add),
+        backgroundColor: Colors.grey.shade200,
+        child: const Icon(Icons.add, size: 32),
       ),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(
+              child: CircularProgressIndicator(
+              color: Colors.white,
+            ))
           : SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
               child: Column(
@@ -111,18 +119,21 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 12),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Text(
-                          userModel!.habitDetails[index]["name"],
-                          style: const TextStyle(fontSize: 20),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              userModel!.habitDetails[index]["name"],
+                              style: const TextStyle(fontSize: 20),
+                            ),
+                            const Icon(Icons.navigate_next),
+                          ],
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 8),
-                        child: showCalender(index, true),
-                      ),
+                      showCalender(index, true),
                     ],
                   ),
                 ),
@@ -152,7 +163,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 12),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: Text(
@@ -160,10 +171,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           style: const TextStyle(fontSize: 20),
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 8),
-                        child: showCalender(index, false),
-                      ),
+                      showCalender(index, false),
                     ],
                   ),
                 ),
@@ -174,82 +182,53 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget showCalender(int index, bool isHabitMake) {
-    return TableCalendar(
-      availableGestures: AvailableGestures.none,
-      headerVisible: false,
-      daysOfWeekVisible: false,
-      calendarStyle: const CalendarStyle(
-        isTodayHighlighted: false,
-      ),
-      calendarBuilders: CalendarBuilders(
-        defaultBuilder: (context, dateTime, focusedDay) {
-          String doneCount = getDoneCount(dateTime, index, isHabitMake);
-          return Center(
-            child: Badge(
-              badgeContent: Text(
-                doneCount,
-                style: const TextStyle(color: Colors.black87, fontSize: 12),
-              ),
-              elevation: 0,
-              badgeColor: Colors.white,
-              padding: const EdgeInsets.all(3),
-              position: BadgePosition.bottomEnd(),
-              child: Container(
-                width: 20,
-                height: 20,
-                decoration: BoxDecoration(
-                  color: dateColor(int.parse(doneCount), index, isHabitMake),
-                  borderRadius: BorderRadius.circular(4),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: TableCalendar(
+        availableGestures: AvailableGestures.none,
+        headerVisible: false,
+        daysOfWeekVisible: false,
+        calendarStyle: const CalendarStyle(
+          isTodayHighlighted: false,
+        ),
+        calendarBuilders: CalendarBuilders(
+          defaultBuilder: (context, dateTime, focusedDay) {
+            String doneCount = getDoneCount(dateTime, index, isHabitMake);
+            return Center(
+              child: Badge(
+                badgeContent: Text(
+                  doneCount,
+                  style: const TextStyle(color: Colors.black87, fontSize: 12),
                 ),
-                child: Center(
-                  child: Text(
-                    dateTime.day.toString(),
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                elevation: 0,
+                badgeColor: Colors.white,
+                padding: const EdgeInsets.all(3),
+                position: BadgePosition.bottomEnd(),
+                child: Container(
+                  width: 20,
+                  height: 20,
+                  decoration: BoxDecoration(
+                    color: dateColor(int.parse(doneCount), index, isHabitMake),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Center(
+                    child: Text(
+                      dateTime.day.toString(),
+                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                    ),
                   ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
+        firstDay: kFirstDay,
+        lastDay: kLastDay,
+        focusedDay: _focusedDay,
+        calendarFormat: _calendarFormat,
+        startingDayOfWeek: startingDayOfWeek,
       ),
-      firstDay: kFirstDay,
-      lastDay: kLastDay,
-      focusedDay: _focusedDay,
-      calendarFormat: _calendarFormat,
-      startingDayOfWeek: startingDayOfWeek,
     );
-  }
-
-  Color dateColor(int doneCount, int index, bool isHabitMake) {
-    if (isHabitMake) {
-      if (doneCount == 0) {
-        return Colors.grey;
-      } else if (doneCount < userModel!.habitDetails[index]["goal"]) {
-        return Colors.orange;
-      }
-      return Colors.green;
-    } else {
-      if (doneCount == 0) {
-        return Colors.green;
-      } else if (doneCount <= userModel!.habitBreakDetails[index]["goal"]) {
-        return Colors.orange;
-      }
-      return Colors.redAccent;
-    }
-  }
-
-  String getDoneCount(DateTime dateTime, int index, isHabitMake) {
-    if (isHabitMake) {
-      return (((userModel!.habitRecords[index][getDateId(dateTime)]) != null) &&
-              (userModel!.habitRecords[index].containsKey(getDateId(dateTime))))
-          ? userModel!.habitRecords[index][getDateId(dateTime)].toString()
-          : "0";
-    } else {
-      return (((userModel!.habitBreakRecords[index][getDateId(dateTime)]) != null) &&
-              (userModel!.habitBreakRecords[index].containsKey(getDateId(dateTime))))
-          ? userModel!.habitBreakRecords[index][getDateId(dateTime)].toString()
-          : "0";
-    }
   }
 
   showBottomSheet(int index, bool isHabitMake) {
@@ -260,7 +239,7 @@ class _HomeScreenState extends State<HomeScreen> {
             builder: (BuildContext context, StateSetter setBottomState) {
               return Container(
                 decoration: const BoxDecoration(
-                  color: Colors.white,
+                  color: kSecondaryTextLight,
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(20),
                     topRight: Radius.circular(20),
@@ -289,10 +268,10 @@ class _HomeScreenState extends State<HomeScreen> {
                               onPressed: () {
                                 Navigator.pop(context);
                                 Get.to(() => CalenderScreen(
-                                  userModel: userModel!,
-                                  index: index,
-                                  isHabitMake: isHabitMake,
-                                ));
+                                      userModel: userModel!,
+                                      index: index,
+                                      isHabitMake: isHabitMake,
+                                    ));
                               },
                               icon: const Icon(Icons.calendar_month_rounded)),
                         ),
@@ -468,6 +447,73 @@ class _HomeScreenState extends State<HomeScreen> {
         .set(userModel.toJson());
   }
 
+  showLogoutConfirmDialog() {
+    showDialog(
+        context: context,
+        builder: (BuildContext ctx) {
+          return AlertDialog(
+            title: const Text('Confirmation'),
+            content: const Text('Logout from this account?'),
+            actions: [
+              ElevatedButton(
+                onPressed: () {
+                  loginService.logout();
+                },
+                style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.redAccent)),
+                child: const Text(
+                  'Yes',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+              const SizedBox(width: 6),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.grey.shade400)),
+                child: const Text(
+                  'No',
+                  style: TextStyle(color: Colors.black87),
+                ),
+              ),
+              const SizedBox(width: 2),
+            ],
+          );
+        });
+  }
+
+  Color dateColor(int doneCount, int index, bool isHabitMake) {
+    if (isHabitMake) {
+      if (doneCount == 0) {
+        return Colors.grey;
+      } else if (doneCount < userModel!.habitDetails[index]["goal"]) {
+        return Colors.orange;
+      }
+      return Colors.green;
+    } else {
+      if (doneCount == 0) {
+        return Colors.green;
+      } else if (doneCount <= userModel!.habitBreakDetails[index]["goal"]) {
+        return Colors.orange;
+      }
+      return Colors.redAccent;
+    }
+  }
+
+  String getDoneCount(DateTime dateTime, int index, isHabitMake) {
+    if (isHabitMake) {
+      return (((userModel!.habitRecords[index][getDateId(dateTime)]) != null) &&
+              (userModel!.habitRecords[index].containsKey(getDateId(dateTime))))
+          ? userModel!.habitRecords[index][getDateId(dateTime)].toString()
+          : "0";
+    } else {
+      return (((userModel!.habitBreakRecords[index][getDateId(dateTime)]) != null) &&
+              (userModel!.habitBreakRecords[index].containsKey(getDateId(dateTime))))
+          ? userModel!.habitBreakRecords[index][getDateId(dateTime)].toString()
+          : "0";
+    }
+  }
+
   double getInitialValue(int index, bool isHabitMake) {
     if (isHabitMake) {
       return userModel!.habitRecords[index][getDateId(dateTime)] != null
@@ -487,7 +533,7 @@ class _HomeScreenState extends State<HomeScreen> {
           : double.parse(userModel!.habitDetails[index]["goal"].toString());
     } else {
       return ((userModel!.habitBreakRecords[index][getDateId(dateTime)] ?? 0) >
-          (userModel!.habitBreakDetails[index]["goal"]))
+              (userModel!.habitBreakDetails[index]["goal"]))
           ? double.parse(userModel!.habitBreakRecords[index][getDateId(dateTime)].toString())
           : double.parse(userModel!.habitBreakDetails[index]["goal"].toString());
     }
@@ -508,12 +554,12 @@ class _HomeScreenState extends State<HomeScreen> {
   Color getTextColor(int index, bool isHabitMake) {
     if (isHabitMake) {
       return ((userModel!.habitRecords[index][getDateId(dateTime)] ?? 0) >= (userModel!.habitDetails[index]["goal"]))
-          ? Colors.black87
+          ? Colors.white
           : Colors.transparent;
     } else {
       return ((userModel!.habitBreakRecords[index][getDateId(dateTime)] ?? 0) >=
-          (userModel!.habitBreakDetails[index]["goal"]))
-          ? Colors.black87
+              (userModel!.habitBreakDetails[index]["goal"]))
+          ? Colors.white
           : Colors.transparent;
     }
   }
