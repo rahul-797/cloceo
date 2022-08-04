@@ -45,7 +45,12 @@ class _LoginScreenState extends State<LoginScreen> {
           height: 8.0,
         ),
         Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            SvgPicture.asset(
+              "assets/illustrations/login.svg",
+              fit: BoxFit.fitWidth,
+            ),
             Padding(
               padding: const EdgeInsets.all(16),
               child: _getLoginButtons(),

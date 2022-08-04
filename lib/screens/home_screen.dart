@@ -145,39 +145,44 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget showBreakHabitTiles() {
     return userModel != null && userModel!.habitBreakDetails.isNotEmpty
-        ? ListView.builder(
-            itemCount: userModel!.habitBreakDetails.length,
-            physics: const NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-            itemBuilder: (context, index) {
-              return GestureDetector(
-                onTap: () {
-                  showBottomSheet(index, false); // "break" habits are sent as false
-                },
-                child: Card(
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 12),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Text(
-                          userModel!.habitBreakDetails[index]["name"],
-                          style: const TextStyle(fontSize: 20),
-                        ),
-                      ),
-                      showCalender(index, false),
-                    ],
-                  ),
+        ? Column(
+      children: [
+        ListView.builder(
+          itemCount: userModel!.habitBreakDetails.length,
+          physics: const NeverScrollableScrollPhysics(),
+          shrinkWrap: true,
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+          itemBuilder: (context, index) {
+            return GestureDetector(
+              onTap: () {
+                showBottomSheet(index, false); // "break" habits are sent as false
+              },
+              child: Card(
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
                 ),
-              );
-            },
-          )
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 12),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Text(
+                        userModel!.habitBreakDetails[index]["name"],
+                        style: const TextStyle(fontSize: 20),
+                      ),
+                    ),
+                    showCalender(index, false),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+        const SizedBox(height: 60),
+      ],
+    )
         : const Center(child: Text("Create first habit"));
   }
 
@@ -280,7 +285,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             isHabitMake
                                 ? userModel!.habitDetails[index]["name"]
                                 : userModel!.habitBreakDetails[index]["name"],
-                            style: const TextStyle(fontSize: 28),
+                            style: const TextStyle(fontSize: 24),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             textAlign: TextAlign.center,
@@ -298,10 +303,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ],
                     ),
-                    const Text(
-                      // formulateHabitTypeString(index),
-                      "hello",
-                      style: TextStyle(fontSize: 14),
+                    Text(
+                      formulateHabitTypeString(index, isHabitMake),
+                      style: const TextStyle(fontSize: 14),
                     ),
                     const SizedBox(height: 16),
                     Padding(
@@ -570,5 +574,26 @@ class _HomeScreenState extends State<HomeScreen> {
     } else {
       return "No more!";
     }
+  }
+
+  String formulateHabitTypeString(int index, bool isHabitMake) {
+    if (isHabitMake) {
+      if (userModel!.habitDetails[index]["repetition"] == 1) {
+        return "Daily goal: ${userModel!.habitDetails[index]["goal"]}";
+      } else if (userModel!.habitDetails[index]["repetition"] == 7) {
+        return "Weekly goal: ${userModel!.habitDetails[index]["goal"]}";
+      } else if (userModel!.habitDetails[index]["repetition"] == 30) {
+        return "Monthly goal: ${userModel!.habitDetails[index]["goal"]}";
+      }
+    } else if (!isHabitMake) {
+      if (userModel!.habitBreakDetails[index]["repetition"] == 1) {
+        return "Daily maximum: ${userModel!.habitBreakDetails[index]["goal"]}";
+      } else if (userModel!.habitBreakDetails[index]["repetition"] == 7) {
+        return "Weekly maximum: ${userModel!.habitBreakDetails[index]["goal"]}";
+      } else if (userModel!.habitBreakDetails[index]["repetition"] == 30) {
+        return "Monthly maximum: ${userModel!.habitBreakDetails[index]["goal"]}";
+      }
+    }
+    return "repeatTime is not 1/7/30";
   }
 }
