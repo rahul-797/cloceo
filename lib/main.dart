@@ -37,7 +37,7 @@ void main() async {
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            primary: kAccentLight,
+            backgroundColor: kAccentLight,
           ),
         ),
       ),

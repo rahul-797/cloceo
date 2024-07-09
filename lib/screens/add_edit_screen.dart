@@ -15,8 +15,12 @@ class AddEditScreen extends StatefulWidget {
   final bool isAdding;
   final bool? isHabitMake;
 
-  const AddEditScreen({Key? key, required this.userModel, this.index, required this.isAdding, this.isHabitMake})
-      : super(key: key);
+  const AddEditScreen(
+      {super.key,
+      required this.userModel,
+      this.index,
+      required this.isAdding,
+      this.isHabitMake});
 
   @override
   State<AddEditScreen> createState() => _AddEditScreenState();
@@ -113,7 +117,8 @@ class _AddEditScreenState extends State<AddEditScreen> {
                   update(userModel);
                   Get.offAll(() => const HomeScreen());
                 },
-                style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.redAccent)),
+                style: ButtonStyle(
+                    backgroundColor: WidgetStateProperty.all(Colors.redAccent)),
                 child: const Text(
                   'Yes',
                   style: TextStyle(color: Colors.white),
@@ -124,7 +129,9 @@ class _AddEditScreenState extends State<AddEditScreen> {
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.grey.shade400)),
+                style: ButtonStyle(
+                    backgroundColor:
+                        WidgetStateProperty.all(Colors.grey.shade400)),
                 child: const Text(
                   'No',
                   style: TextStyle(color: Colors.black87),
@@ -346,7 +353,8 @@ class _AddEditScreenState extends State<AddEditScreen> {
               return;
             },
             style: ButtonStyle(
-              padding: MaterialStateProperty.all(const EdgeInsets.symmetric(vertical: 12)),
+              padding: WidgetStateProperty.all(
+                  const EdgeInsets.symmetric(vertical: 12)),
             ),
             child: const Center(
               child: Text(

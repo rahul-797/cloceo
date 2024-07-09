@@ -1,4 +1,4 @@
-import 'package:badges/badges.dart';
+import 'package:badges/badges.dart' as badges;
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:you/models/user_model.dart';
@@ -9,8 +9,11 @@ class CalenderScreen extends StatefulWidget {
   final int index;
   final bool isHabitMake;
 
-  const CalenderScreen({Key? key, required this.userModel, required this.index, required this.isHabitMake})
-      : super(key: key);
+  const CalenderScreen(
+      {super.key,
+      required this.userModel,
+      required this.index,
+      required this.isHabitMake});
 
   @override
   State<CalenderScreen> createState() => _CalenderScreenState();
@@ -60,15 +63,12 @@ class _CalenderScreenState extends State<CalenderScreen> {
                     defaultBuilder: (context, dateTime, focusedDay) {
                       String doneCount = getDoneCount(dateTime, isHabitMake);
                       return Center(
-                        child: Badge(
+                        child: badges.Badge(
                           badgeContent: Text(
                             doneCount,
                             style: const TextStyle(color: Colors.black87),
                           ),
-                          elevation: 0,
-                          badgeColor: Colors.white,
-                          padding: const EdgeInsets.all(4),
-                          position: BadgePosition.bottomEnd(),
+                          position: badges.BadgePosition.bottomEnd(),
                           child: Container(
                             width: 32,
                             height: 32,

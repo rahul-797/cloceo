@@ -1,4 +1,4 @@
-import 'package:badges/badges.dart';
+import 'package:badges/badges.dart' as badges;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +15,7 @@ import 'package:you/utils/date_provider.dart';
 import 'package:you/utils/startday_provider.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -29,7 +29,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final CalendarFormat _calendarFormat = CalendarFormat.week;
   final DateTime _focusedDay = DateTime.now();
-  final kFirstDay = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day - 6);
+  final kFirstDay = DateTime(
+      DateTime.now().year, DateTime.now().month, DateTime.now().day - 6);
   final kLastDay = DateTime.now();
   late String startDay;
   late StartingDayOfWeek startingDayOfWeek;
@@ -74,21 +75,22 @@ class _HomeScreenState extends State<HomeScreen> {
           : SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 16),
+                    padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
                     child: Text(
-                      "Habits to make",
+                      "Routines to adopt",
                       style: TextStyle(fontSize: 18),
                     ),
                   ),
                   showMakeHabitTiles(),
                   const Divider(),
                   const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 16),
+                    padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
                     child: Text(
-                      "Habits to break",
+                      "Habits to overcome",
                       style: TextStyle(fontSize: 18),
                     ),
                   ),
@@ -109,7 +111,8 @@ class _HomeScreenState extends State<HomeScreen> {
             itemBuilder: (context, index) {
               return GestureDetector(
                 onTap: () {
-                  showBottomSheet(index, true); // "make" habits are sent as true
+                  showBottomSheet(
+                      index, true); // "make" habits are sent as true
                 },
                 child: Card(
                   elevation: 0,
@@ -146,43 +149,50 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget showBreakHabitTiles() {
     return userModel != null && userModel!.habitBreakDetails.isNotEmpty
         ? Column(
-      children: [
-        ListView.builder(
-          itemCount: userModel!.habitBreakDetails.length,
-          physics: const NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-          itemBuilder: (context, index) {
-            return GestureDetector(
-              onTap: () {
-                showBottomSheet(index, false); // "break" habits are sent as false
-              },
-              child: Card(
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 12),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Text(
-                        userModel!.habitBreakDetails[index]["name"],
-                        style: const TextStyle(fontSize: 20),
+            children: [
+              ListView.builder(
+                itemCount: userModel!.habitBreakDetails.length,
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                    onTap: () {
+                      showBottomSheet(
+                          index, false); // "break" habits are sent as false
+                    },
+                    child: Card(
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 12),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  userModel!.habitBreakDetails[index]["name"],
+                                  style: const TextStyle(fontSize: 20),
+                                ),
+                                const Icon(Icons.navigate_next),
+                              ],
+                            ),
+                          ),
+                          showCalender(index, false),
+                        ],
                       ),
                     ),
-                    showCalender(index, false),
-                  ],
-                ),
+                  );
+                },
               ),
-            );
-          },
-        ),
-        const SizedBox(height: 60),
-      ],
-    )
+              const SizedBox(height: 60),
+            ],
+          )
         : const Center(child: Text("Create first habit"));
   }
 
@@ -200,15 +210,13 @@ class _HomeScreenState extends State<HomeScreen> {
           defaultBuilder: (context, dateTime, focusedDay) {
             String doneCount = getDoneCount(dateTime, index, isHabitMake);
             return Center(
-              child: Badge(
+              child: badges.Badge(
                 badgeContent: Text(
                   doneCount,
-                  style: const TextStyle(color: Colors.black87, fontSize: 12),
+                  style: const TextStyle(color: Colors.black87, fontSize: 10),
                 ),
-                elevation: 0,
-                badgeColor: Colors.white,
-                padding: const EdgeInsets.all(3),
-                position: BadgePosition.bottomEnd(),
+                badgeStyle: badges.BadgeStyle(badgeColor: Colors.white),
+                position: badges.BadgePosition.bottomEnd(),
                 child: Container(
                   width: 20,
                   height: 20,
@@ -219,7 +227,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Center(
                     child: Text(
                       dateTime.day.toString(),
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12),
                     ),
                   ),
                 ),
@@ -259,7 +270,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: Container(
                           height: 4,
                           width: 36,
-                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(2), color: Colors.grey),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(2),
+                              color: Colors.grey),
                         ),
                       ),
                     ),
@@ -297,7 +310,10 @@ class _HomeScreenState extends State<HomeScreen> {
                               onPressed: () async {
                                 Navigator.pop(context);
                                 Get.to(() => AddEditScreen(
-                                    userModel: userModel, isAdding: false, index: index, isHabitMake: isHabitMake));
+                                    userModel: userModel,
+                                    isAdding: false,
+                                    index: index,
+                                    isHabitMake: isHabitMake));
                               },
                               icon: const Icon(Icons.edit)),
                         ),
@@ -316,20 +332,30 @@ class _HomeScreenState extends State<HomeScreen> {
                           IconButton(
                             onPressed: () {
                               if (isHabitMake) {
-                                if (userModel!.habitRecords[index].containsKey(getDateId(dateTime))) {
-                                  if (userModel!.habitRecords[index][getDateId(dateTime)] > 0) {
-                                    userModel!.habitRecords[index][getDateId(dateTime)] -= 1;
+                                if (userModel!.habitRecords[index]
+                                    .containsKey(getDateId(dateTime))) {
+                                  if (userModel!.habitRecords[index]
+                                          [getDateId(dateTime)] >
+                                      0) {
+                                    userModel!.habitRecords[index]
+                                        [getDateId(dateTime)] -= 1;
                                   }
                                 } else {
-                                  userModel!.habitRecords[index][getDateId(dateTime)] = 0;
+                                  userModel!.habitRecords[index]
+                                      [getDateId(dateTime)] = 0;
                                 }
                               } else {
-                                if (userModel!.habitBreakRecords[index].containsKey(getDateId(dateTime))) {
-                                  if (userModel!.habitBreakRecords[index][getDateId(dateTime)] > 0) {
-                                    userModel!.habitBreakRecords[index][getDateId(dateTime)] -= 1;
+                                if (userModel!.habitBreakRecords[index]
+                                    .containsKey(getDateId(dateTime))) {
+                                  if (userModel!.habitBreakRecords[index]
+                                          [getDateId(dateTime)] >
+                                      0) {
+                                    userModel!.habitBreakRecords[index]
+                                        [getDateId(dateTime)] -= 1;
                                   }
                                 } else {
-                                  userModel!.habitBreakRecords[index][getDateId(dateTime)] = 0;
+                                  userModel!.habitBreakRecords[index]
+                                      [getDateId(dateTime)] = 0;
                                 }
                               }
                               update(userModel!);
@@ -359,19 +385,24 @@ class _HomeScreenState extends State<HomeScreen> {
                                     getDoneText(index, isHabitMake),
                                     style: TextStyle(
                                       fontSize: 16,
-                                      color: getTextColor(index, isHabitMake), // update
+                                      color: getTextColor(
+                                          index, isHabitMake), // update
                                     ),
                                   ),
                                 ],
                               ),
                               appearance: CircularSliderAppearance(
                                 animationEnabled: false,
-                                customWidths: CustomSliderWidths(progressBarWidth: 12, trackWidth: 12),
+                                customWidths: CustomSliderWidths(
+                                    progressBarWidth: 12, trackWidth: 12),
                                 customColors: CustomSliderColors(
                                   dotColor: Colors.transparent,
                                   hideShadow: true,
                                   trackColor: Colors.blueGrey.shade50,
-                                  progressBarColors: [Colors.blueAccent, Colors.lightBlueAccent],
+                                  progressBarColors: [
+                                    Colors.blueAccent,
+                                    Colors.lightBlueAccent
+                                  ],
                                 ),
                               ),
                             ),
@@ -379,16 +410,22 @@ class _HomeScreenState extends State<HomeScreen> {
                           IconButton(
                             onPressed: () {
                               if (isHabitMake) {
-                                if (userModel!.habitRecords[index].containsKey(getDateId(dateTime))) {
-                                  userModel!.habitRecords[index][getDateId(dateTime)] += 1;
+                                if (userModel!.habitRecords[index]
+                                    .containsKey(getDateId(dateTime))) {
+                                  userModel!.habitRecords[index]
+                                      [getDateId(dateTime)] += 1;
                                 } else {
-                                  userModel!.habitRecords[index][getDateId(dateTime)] = 1;
+                                  userModel!.habitRecords[index]
+                                      [getDateId(dateTime)] = 1;
                                 }
                               } else {
-                                if (userModel!.habitBreakRecords[index].containsKey(getDateId(dateTime))) {
-                                  userModel!.habitBreakRecords[index][getDateId(dateTime)] += 1;
+                                if (userModel!.habitBreakRecords[index]
+                                    .containsKey(getDateId(dateTime))) {
+                                  userModel!.habitBreakRecords[index]
+                                      [getDateId(dateTime)] += 1;
                                 } else {
-                                  userModel!.habitBreakRecords[index][getDateId(dateTime)] = 1;
+                                  userModel!.habitBreakRecords[index]
+                                      [getDateId(dateTime)] = 1;
                                 }
                               }
                               update(userModel!);
@@ -425,7 +462,8 @@ class _HomeScreenState extends State<HomeScreen> {
         .get()
         .then((DocumentSnapshot documentSnapshot) {
       if (documentSnapshot.exists) {
-        userModel = UserModel.fromJson(documentSnapshot.data() as Map<String, dynamic>);
+        userModel =
+            UserModel.fromJson(documentSnapshot.data() as Map<String, dynamic>);
         setState(() {
           isLoading = false;
         });
@@ -463,7 +501,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 onPressed: () {
                   loginService.logout();
                 },
-                style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.redAccent)),
+                style: ButtonStyle(
+                    backgroundColor: WidgetStateProperty.all(Colors.redAccent)),
                 child: const Text(
                   'Yes',
                   style: TextStyle(color: Colors.white),
@@ -474,7 +513,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.grey.shade400)),
+                style: ButtonStyle(
+                    backgroundColor:
+                        WidgetStateProperty.all(Colors.grey.shade400)),
                 child: const Text(
                   'No',
                   style: TextStyle(color: Colors.black87),
@@ -511,8 +552,10 @@ class _HomeScreenState extends State<HomeScreen> {
           ? userModel!.habitRecords[index][getDateId(dateTime)].toString()
           : "0";
     } else {
-      return (((userModel!.habitBreakRecords[index][getDateId(dateTime)]) != null) &&
-              (userModel!.habitBreakRecords[index].containsKey(getDateId(dateTime))))
+      return (((userModel!.habitBreakRecords[index][getDateId(dateTime)]) !=
+                  null) &&
+              (userModel!.habitBreakRecords[index]
+                  .containsKey(getDateId(dateTime))))
           ? userModel!.habitBreakRecords[index][getDateId(dateTime)].toString()
           : "0";
     }
@@ -521,25 +564,33 @@ class _HomeScreenState extends State<HomeScreen> {
   double getInitialValue(int index, bool isHabitMake) {
     if (isHabitMake) {
       return userModel!.habitRecords[index][getDateId(dateTime)] != null
-          ? double.parse(userModel!.habitRecords[index][getDateId(dateTime)].toString())
+          ? double.parse(
+              userModel!.habitRecords[index][getDateId(dateTime)].toString())
           : 0.0;
     } else {
       return userModel!.habitBreakRecords[index][getDateId(dateTime)] != null
-          ? double.parse(userModel!.habitBreakRecords[index][getDateId(dateTime)].toString())
+          ? double.parse(userModel!.habitBreakRecords[index]
+                  [getDateId(dateTime)]
+              .toString())
           : 0.0;
     }
   }
 
   double getMaxValue(int index, bool isHabitMake) {
     if (isHabitMake) {
-      return ((userModel!.habitRecords[index][getDateId(dateTime)] ?? 0) > (userModel!.habitDetails[index]["goal"]))
-          ? double.parse(userModel!.habitRecords[index][getDateId(dateTime)].toString())
+      return ((userModel!.habitRecords[index][getDateId(dateTime)] ?? 0) >
+              (userModel!.habitDetails[index]["goal"]))
+          ? double.parse(
+              userModel!.habitRecords[index][getDateId(dateTime)].toString())
           : double.parse(userModel!.habitDetails[index]["goal"].toString());
     } else {
       return ((userModel!.habitBreakRecords[index][getDateId(dateTime)] ?? 0) >
               (userModel!.habitBreakDetails[index]["goal"]))
-          ? double.parse(userModel!.habitBreakRecords[index][getDateId(dateTime)].toString())
-          : double.parse(userModel!.habitBreakDetails[index]["goal"].toString());
+          ? double.parse(userModel!.habitBreakRecords[index]
+                  [getDateId(dateTime)]
+              .toString())
+          : double.parse(
+              userModel!.habitBreakDetails[index]["goal"].toString());
     }
   }
 
@@ -557,7 +608,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Color getTextColor(int index, bool isHabitMake) {
     if (isHabitMake) {
-      return ((userModel!.habitRecords[index][getDateId(dateTime)] ?? 0) >= (userModel!.habitDetails[index]["goal"]))
+      return ((userModel!.habitRecords[index][getDateId(dateTime)] ?? 0) >=
+              (userModel!.habitDetails[index]["goal"]))
           ? Colors.white
           : Colors.transparent;
     } else {
