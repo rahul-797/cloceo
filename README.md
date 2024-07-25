@@ -1,6 +1,15 @@
-# you
+# Cloceo - Habit Tracker
 
-A new Flutter project.
+PlayStore - https://play.google.com/store/apps/details?id=com.cloceo.you
+
+## Screenshots
+
+<p align="center">
+  <img src="https://github.com/rahul-797/cloceo/blob/master/blob/1.jpg?raw=true" width="200" />
+  <img src="https://github.com/rahul-797/cloceo/blob/master/blob/2.jpg?raw=true" width="200" />
+  <img src="https://github.com/rahul-797/cloceo/blob/master/blob/3.jpg?raw=true" width="200" />
+  <img src="https://github.com/rahul-797/cloceo/blob/master/blob/4.jpg?raw=true" width="200" />
+</p>
 
 ## Getting Started
 
