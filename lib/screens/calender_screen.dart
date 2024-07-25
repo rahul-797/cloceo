@@ -22,7 +22,8 @@ class CalenderScreen extends StatefulWidget {
 class _CalenderScreenState extends State<CalenderScreen> {
   final CalendarFormat _calendarFormat = CalendarFormat.month;
   final DateTime _focusedDay = DateTime.now();
-  final kFirstDay = DateTime(DateTime.now().year, DateTime.now().month - 1, DateTime.now().day);
+  final kFirstDay = DateTime(
+      DateTime.now().year, DateTime.now().month - 1, DateTime.now().day);
   final kLastDay = DateTime.now();
   late UserModel userModel;
   late int index;
@@ -45,7 +46,9 @@ class _CalenderScreenState extends State<CalenderScreen> {
           child: Column(
             children: [
               Text(
-                isHabitMake ? userModel.habitDetails[index]["name"] : userModel.habitBreakDetails[index]["name"],
+                isHabitMake
+                    ? userModel.habitDetails[index]["name"]
+                    : userModel.habitBreakDetails[index]["name"],
                 style: const TextStyle(fontSize: 28),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -64,6 +67,7 @@ class _CalenderScreenState extends State<CalenderScreen> {
                       String doneCount = getDoneCount(dateTime, isHabitMake);
                       return Center(
                         child: badges.Badge(
+                          badgeStyle: badges.BadgeStyle(badgeColor: Colors.white),
                           badgeContent: Text(
                             doneCount,
                             style: const TextStyle(color: Colors.black87),
@@ -73,14 +77,18 @@ class _CalenderScreenState extends State<CalenderScreen> {
                             width: 32,
                             height: 32,
                             decoration: BoxDecoration(
-                              color: dateColor(int.parse(doneCount), isHabitMake),
+                              color:
+                                  dateColor(int.parse(doneCount), isHabitMake),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Center(
                               child: Text(
                                 dateTime.day.toString(),
-                                style:
-                                    const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
                               ),
                             ),
                           ),
@@ -126,8 +134,10 @@ class _CalenderScreenState extends State<CalenderScreen> {
           ? userModel.habitRecords[index][getDateId(dateTime)].toString()
           : "0";
     } else {
-      return (((userModel.habitBreakRecords[index][getDateId(dateTime)]) != null) &&
-              (userModel.habitBreakRecords[index].containsKey(getDateId(dateTime))))
+      return (((userModel.habitBreakRecords[index][getDateId(dateTime)]) !=
+                  null) &&
+              (userModel.habitBreakRecords[index]
+                  .containsKey(getDateId(dateTime))))
           ? userModel.habitBreakRecords[index][getDateId(dateTime)].toString()
           : "0";
     }

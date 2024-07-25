@@ -176,49 +176,47 @@ class _AddEditScreenState extends State<AddEditScreen> {
                       const SizedBox(height: 10),
                       TextFormField(
                         initialValue: getInitialName(index, isHabitMake),
-                        keyboardType: TextInputType.text,
+                        keyboardType: TextInputType.name,
                         maxLines: 1,
                         validator: (str) => str == "" ? "* Can not be blank" : null,
                         decoration: InputDecoration(
                           hintText: "Habit name",
-                          hintStyle: TextStyle(color: Colors.grey.shade200),
+                          hintStyle: TextStyle(color: Colors.grey),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(20),
-                            borderSide: const BorderSide(color: Colors.white),
+                            borderSide: const BorderSide(color: Colors.black87),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(20),
-                            borderSide: const BorderSide(color: Colors.white),
+                            borderSide: const BorderSide(color: Colors.black87),
                           ),
                         ),
-                        keyboardAppearance: Brightness.dark,
-                        cursorColor: Colors.white,
+                        keyboardAppearance: Brightness.light,
+                        cursorColor: Colors.black87,
                         onChanged: (str) {
                           str = toBeginningOfSentenceCase(str)!;
                           name = str;
                         },
                       ),
-                      const SizedBox(height: 16),
-                      const Divider(color: Colors.grey),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 24),
                       const Text(
                         "I want to",
-                        style: TextStyle(fontSize: 16),
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                       ),
                       const SizedBox(height: 10),
                       CustomRadioButton(
                         elevation: 0,
                         width: 148,
-                        unSelectedColor: kSecondaryTextLight,
-                        selectedColor: kPrimaryBackgroundLight,
+                        unSelectedColor: kPrimaryBackgroundLight,
+                        selectedColor: kSecondaryTextLight,
                         defaultSelected: type,
                         enableShape: true,
                         padding: 6,
                         buttonLables: const ['Build a habit', 'Break a habit'],
                         buttonValues: const ["make", "break"],
                         buttonTextStyle: const ButtonTextStyle(
-                          selectedColor: kPrimaryTextLight,
-                          unSelectedColor: kPrimaryBackgroundLight,
+                          selectedColor: kPrimaryBackgroundLight,
+                          unSelectedColor: kPrimaryTextLight,
                           textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
                         ),
                         radioButtonValue: (value) {
@@ -226,9 +224,7 @@ class _AddEditScreenState extends State<AddEditScreen> {
                           setState(() {});
                         },
                       ),
-                      const SizedBox(height: 16),
-                      const Divider(color: Colors.grey),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 24),
                       // const Text(
                       //   "How often?",
                       //   style: TextStyle(fontSize: 16),
@@ -256,22 +252,23 @@ class _AddEditScreenState extends State<AddEditScreen> {
                       // const SizedBox(height: 16),
                       Text(
                         type == "make" ? "My goal" : "Maximum limit",
-                        style: const TextStyle(fontSize: 16),
+                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                       ),
                       const SizedBox(height: 10),
                       CustomRadioButton(
                         elevation: 0,
                         width: 64,
-                        unSelectedColor: kSecondaryTextLight,
-                        selectedColor: kPrimaryBackgroundLight,
+                        unSelectedColor: kPrimaryBackgroundLight,
+                        selectedColor: kSecondaryTextLight,
                         defaultSelected: goal,
                         enableShape: true,
                         padding: 6,
+                        enableButtonWrap: true,
                         buttonLables: countingString,
                         buttonValues: countingInt,
                         buttonTextStyle: const ButtonTextStyle(
-                          selectedColor: kPrimaryTextLight,
-                          unSelectedColor: kPrimaryBackgroundLight,
+                          selectedColor: kPrimaryBackgroundLight,
+                          unSelectedColor: kPrimaryTextLight,
                           textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
                         ),
                         radioButtonValue: (value) => goal = int.parse(value.toString()),
@@ -282,84 +279,88 @@ class _AddEditScreenState extends State<AddEditScreen> {
               ),
             ),
           ),
-          ElevatedButton(
-            onPressed: () {
-              if (_formKey.currentState!.validate()) {
-                if (isAdding) {
-                  // add new habit
-                  if (type == "make") {
-                    userModel.habitDetails.add({
-                      "name": name,
-                      "goal": goal,
-                      "type": type,
-                      "repetition": repetition,
-                    });
-                    userModel.habitRecords.add({});
-                  } else {
-                    userModel.habitBreakDetails.add({
-                      "name": name,
-                      "goal": goal,
-                      "type": type,
-                      "repetition": repetition,
-                    });
-                    userModel.habitBreakRecords.add({});
-                  }
-                } else {
-                  // update habit
-                  String previousType = isHabitMake! ? "make" : "break";
-                  if (previousType == type) {
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: ElevatedButton(
+              onPressed: () {
+                if (_formKey.currentState!.validate()) {
+                  if (isAdding) {
+                    // add new habit
                     if (type == "make") {
-                      userModel.habitDetails[index] = {
-                        "name": name,
-                        "goal": goal,
-                        "type": type,
-                        "repetition": repetition,
-                      };
-                    } else {
-                      userModel.habitBreakDetails[index] = {
-                        "name": name,
-                        "goal": goal,
-                        "type": type,
-                        "repetition": repetition,
-                      };
-                    }
-                  } else {
-                    if (type == "make") {
-                      userModel.habitDetails.insert(0, {
+                      userModel.habitDetails.add({
                         "name": name,
                         "goal": goal,
                         "type": type,
                         "repetition": repetition,
                       });
-                      userModel.habitBreakDetails.removeAt(index);
-                      userModel.habitRecords.insert(0, userModel.habitBreakRecords[index]);
-                      userModel.habitBreakRecords.removeAt(index);
+                      userModel.habitRecords.add({});
                     } else {
-                      userModel.habitBreakDetails.insert(0, {
+                      userModel.habitBreakDetails.add({
                         "name": name,
                         "goal": goal,
                         "type": type,
                         "repetition": repetition,
                       });
-                      userModel.habitDetails.removeAt(index);
-                      userModel.habitBreakRecords.insert(0, userModel.habitRecords[index]);
-                      userModel.habitRecords.removeAt(index);
+                      userModel.habitBreakRecords.add({});
+                    }
+                  } else {
+                    // update habit
+                    String previousType = isHabitMake! ? "make" : "break";
+                    if (previousType == type) {
+                      if (type == "make") {
+                        userModel.habitDetails[index] = {
+                          "name": name,
+                          "goal": goal,
+                          "type": type,
+                          "repetition": repetition,
+                        };
+                      } else {
+                        userModel.habitBreakDetails[index] = {
+                          "name": name,
+                          "goal": goal,
+                          "type": type,
+                          "repetition": repetition,
+                        };
+                      }
+                    } else {
+                      if (type == "make") {
+                        userModel.habitDetails.insert(0, {
+                          "name": name,
+                          "goal": goal,
+                          "type": type,
+                          "repetition": repetition,
+                        });
+                        userModel.habitBreakDetails.removeAt(index);
+                        userModel.habitRecords.insert(0, userModel.habitBreakRecords[index]);
+                        userModel.habitBreakRecords.removeAt(index);
+                      } else {
+                        userModel.habitBreakDetails.insert(0, {
+                          "name": name,
+                          "goal": goal,
+                          "type": type,
+                          "repetition": repetition,
+                        });
+                        userModel.habitDetails.removeAt(index);
+                        userModel.habitBreakRecords.insert(0, userModel.habitRecords[index]);
+                        userModel.habitRecords.removeAt(index);
+                      }
                     }
                   }
+                  update(userModel);
+                  Get.offAll(() => const HomeScreen());
                 }
-                update(userModel);
-                Get.offAll(() => const HomeScreen());
-              }
-              return;
-            },
-            style: ButtonStyle(
-              padding: WidgetStateProperty.all(
-                  const EdgeInsets.symmetric(vertical: 12)),
-            ),
-            child: const Center(
-              child: Text(
-                "Save",
-                style: TextStyle(fontSize: 20, color: Colors.white),
+                return;
+              },
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(Colors.black87),
+                padding: WidgetStateProperty.all(
+                    const EdgeInsets.symmetric(vertical: 12)),
+              ),
+              child: const Center(
+                child: Text(
+                  "Save",
+                  style: TextStyle(fontSize: 20, color: Colors.white),
+                ),
               ),
             ),
           ),

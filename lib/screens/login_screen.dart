@@ -19,14 +19,14 @@ class _LoginScreenState extends State<LoginScreen> {
       appBar: AppBar(
         title: const Text(
           "Cloceo",
-          style: TextStyle(fontSize: 24),
+          style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800),
         ),
       ),
       body: SafeArea(
         child: isLoading
             ? const Center(
                 child: CircularProgressIndicator(
-                  color: Colors.white,
+                  color: Colors.black87,
                 ),
               )
             : _getContent(),
@@ -35,36 +35,34 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   _getContent() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        const SizedBox(
-          height: 24.0,
-        ),
-        const SizedBox(
-          height: 8.0,
-        ),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SvgPicture.asset(
-              "assets/illustrations/login.svg",
-              fit: BoxFit.fitWidth,
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text(
+            "Track Your Progress, Achieve Your Goals. Start Building Better Habits Today!",
+            style: TextStyle(
+              color: Colors.black87,
+              fontSize: 22,
             ),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: _getLoginButtons(),
-            ),
-          ],
-        ),
-      ],
+          ),
+          SvgPicture.asset(
+            "assets/illustrations/login.svg",
+            height: MediaQuery.of(context).size.height / 2,
+          ),
+          _getLoginButton(),
+        ],
+      ),
     );
   }
 
-  _getLoginButtons() {
+  _getLoginButton() {
     return OutlinedButton(
       style: OutlinedButton.styleFrom(
-        side: const BorderSide(color: Colors.white),
+        backgroundColor: Colors.black87,
+        side: const BorderSide(color: Colors.black87),
         padding: const EdgeInsets.all(16),
       ),
       child: Row(

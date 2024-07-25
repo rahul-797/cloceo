@@ -50,7 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text(
           "Cloceo",
-          style: TextStyle(fontSize: 24),
+          style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800),
         ),
         actions: [
           IconButton(
@@ -70,28 +70,28 @@ class _HomeScreenState extends State<HomeScreen> {
       body: isLoading
           ? const Center(
               child: CircularProgressIndicator(
-              color: Colors.white,
+              color: Colors.black,
             ))
           : SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   const Padding(
                     padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
                     child: Text(
                       "Routines to adopt",
-                      style: TextStyle(fontSize: 18),
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                     ),
                   ),
                   showMakeHabitTiles(),
-                  const Divider(),
                   const Padding(
                     padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
                     child: Text(
                       "Habits to overcome",
-                      style: TextStyle(fontSize: 18),
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                     ),
                   ),
                   showBreakHabitTiles(),
@@ -255,7 +255,7 @@ class _HomeScreenState extends State<HomeScreen> {
             builder: (BuildContext context, StateSetter setBottomState) {
               return Container(
                 decoration: const BoxDecoration(
-                  color: kSecondaryTextLight,
+                  color: Colors.white,
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(20),
                     topRight: Radius.circular(20),
@@ -283,15 +283,19 @@ class _HomeScreenState extends State<HomeScreen> {
                         Padding(
                           padding: const EdgeInsets.all(16),
                           child: IconButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                                Get.to(() => CalenderScreen(
-                                      userModel: userModel!,
-                                      index: index,
-                                      isHabitMake: isHabitMake,
-                                    ));
-                              },
-                              icon: const Icon(Icons.calendar_month_rounded)),
+                            onPressed: () {
+                              Navigator.pop(context);
+                              Get.to(() => CalenderScreen(
+                                    userModel: userModel!,
+                                    index: index,
+                                    isHabitMake: isHabitMake,
+                                  ));
+                            },
+                            icon: const Icon(
+                              Icons.calendar_month_rounded,
+                              color: Colors.black87,
+                            ),
+                          ),
                         ),
                         Expanded(
                           child: Text(
